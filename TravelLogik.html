@@ -1,0 +1,2592 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TravelLogik - Selbstbuchung & Reiseplanung</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f0f4f8;--card:#fff;--primary:#1a5276;--primary-dark:#154360;
+  --accent:#2e86c1;--accent2:#1abc9c;--muted:#7f8c8d;--border:#d5dce8;
+  --text:#1c2833;--text-light:#566573;--danger:#e74c3c;--warn:#f39c12;
+  --success:#27ae60;--radius:12px;--shadow:0 2px 16px rgba(0,0,0,.08);
+}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* ── HEADER ── */
+header{background:linear-gradient(135deg,var(--primary-dark),var(--accent));color:#fff;padding:0 2rem;display:flex;align-items:center;gap:1rem;height:60px;box-shadow:0 2px 12px rgba(0,0,0,.25);position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:.5rem;font-size:1.3rem;font-weight:700;letter-spacing:.04em;text-decoration:none;color:#fff}
+.logo svg{width:28px;height:28px}
+.tagline{font-size:.75rem;opacity:.78;margin-left:.25rem;align-self:flex-end;padding-bottom:2px}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:1rem}
+.my-bookings-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:.4rem 1rem;border-radius:20px;cursor:pointer;font-size:.85rem;transition:.2s}
+.my-bookings-btn:hover{background:rgba(255,255,255,.25)}
+.product-banner{background:#fff;border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);padding:1rem 1.1rem;margin-bottom:1rem}
+.product-banner-head{display:flex;justify-content:space-between;gap:1rem;align-items:flex-start;flex-wrap:wrap}
+.product-badges{display:flex;gap:.45rem;flex-wrap:wrap}
+.product-badge{display:inline-flex;align-items:center;gap:.35rem;padding:.28rem .7rem;border-radius:999px;font-size:.74rem;font-weight:700;border:1px solid transparent}
+.product-badge.beta{background:#eef6fb;border-color:#d6e8f5;color:#1a5276}
+.product-badge.live{background:#eafaf1;border-color:#b7e4c7;color:#1e8449}
+.product-badge.demo{background:#fff8e8;border-color:#f9e79f;color:#9a7d0a}
+.product-badge.local{background:#f7f9fb;border-color:#d5dce8;color:#566573}
+.product-banner-copy{font-size:.88rem;color:var(--text-light);line-height:1.6;max-width:760px}
+.notice-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.8rem;margin:1rem 0 1.2rem}
+.notice-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:1rem;box-shadow:var(--shadow)}
+.notice-card strong{display:block;color:var(--primary);margin-bottom:.35rem}
+.notice-card p{font-size:.84rem;color:var(--text-light);line-height:1.55}
+.inline-note{font-size:.82rem;color:var(--text-light);line-height:1.55}
+.beta-inline-note{background:#f7fbfe;border:1px solid #d6e8f5;color:#1a5276;border-radius:10px;padding:.75rem .9rem;font-size:.82rem;line-height:1.55}
+
+/* ── NAV TABS ── */
+nav{background:#fff;border-bottom:1px solid var(--border);display:flex;overflow-x:auto;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.nav-tab{display:flex;align-items:center;gap:.45rem;padding:.9rem 1.5rem;border:none;background:none;cursor:pointer;color:var(--text-light);font-size:.9rem;font-weight:500;border-bottom:3px solid transparent;transition:.2s;white-space:nowrap}
+.nav-tab:hover{color:var(--accent);background:rgba(46,134,193,.05)}
+.nav-tab.active{color:var(--accent);border-bottom-color:var(--accent);background:rgba(46,134,193,.06)}
+.nav-tab svg{width:18px;height:18px}
+
+/* ── TRIP CONTEXT BAR ── */
+#trip-bar{display:none;background:#fff;border-bottom:2px solid var(--accent);padding:.6rem 2rem;position:sticky;top:60px;z-index:90;box-shadow:0 2px 8px rgba(0,0,0,.07)}
+.trip-bar-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+.trip-summary{display:flex;align-items:center;gap:.5rem;font-size:.88rem;font-weight:600;color:var(--primary);flex-shrink:0}
+.trip-summary .sep{color:var(--muted);font-weight:400}
+.trip-modules{display:flex;gap:.35rem;flex-wrap:wrap;flex:1}
+.trip-mod{display:inline-flex;align-items:center;gap:.3rem;padding:.25rem .7rem;border-radius:12px;font-size:.78rem;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:#fff;color:var(--text-light);transition:.2s;white-space:nowrap}
+.trip-mod:hover{border-color:var(--accent);color:var(--accent)}
+.trip-mod.done{background:#eafaf1;border-color:#a9dfbf;color:var(--success)}
+.trip-mod.active-mod{background:#eaf3fc;border-color:var(--accent);color:var(--accent)}
+.trip-mod .mod-check{font-size:.85rem}
+.trip-clear{margin-left:auto;font-size:.75rem;color:var(--muted);cursor:pointer;padding:.2rem .5rem;border:1px solid var(--border);border-radius:6px;background:none;flex-shrink:0}
+.trip-clear:hover{color:var(--danger);border-color:var(--danger)}
+/* ── SUGGEST BANNER ── */
+.suggest-banner{background:linear-gradient(135deg,#eaf3fc,#f0faf5);border:1.5px solid var(--accent);border-radius:var(--radius);padding:1rem 1.2rem;margin-bottom:1.2rem;display:none;align-items:center;gap:.8rem;flex-wrap:wrap}
+.suggest-banner.show{display:flex}
+.suggest-text{flex:1;font-size:.88rem;color:var(--primary);font-weight:500}
+.suggest-actions{display:flex;gap:.5rem;flex-wrap:wrap}
+/* ── MAIN ── */
+main{max-width:1100px;margin:0 auto;padding:2rem 1rem}
+.page{display:none}.page.active{display:block}
+
+/* ── CARD ── */
+.card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);padding:1.5rem;margin-bottom:1.5rem}
+.card-title{font-size:1rem;font-weight:600;color:var(--primary);margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
+
+/* ── HERO SEARCH ── */
+.hero{background:linear-gradient(135deg,var(--primary-dark) 0%,var(--accent) 100%);border-radius:var(--radius);padding:2rem;margin-bottom:2rem;color:#fff}
+.hero h2{font-size:1.5rem;margin-bottom:.4rem}
+.hero p{opacity:.8;font-size:.9rem;margin-bottom:1.5rem}
+
+/* ── FORM ── */
+.form-row{display:grid;gap:1rem;margin-bottom:1rem}
+.form-row.cols-2{grid-template-columns:1fr 1fr}
+.form-row.cols-3{grid-template-columns:1fr 1fr 1fr}
+.form-row.cols-4{grid-template-columns:1fr 1fr 1fr 1fr}
+@media(max-width:600px){.form-row.cols-2,.form-row.cols-3,.form-row.cols-4{grid-template-columns:1fr}}
+.form-group{display:flex;flex-direction:column;gap:.35rem}
+label{font-size:.8rem;font-weight:600;color:var(--text-light);text-transform:uppercase;letter-spacing:.04em}
+input,select,textarea{padding:.65rem .9rem;border:1.5px solid var(--border);border-radius:8px;font-size:.9rem;color:var(--text);background:#fff;transition:.2s;width:100%}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(46,134,193,.12)}
+.input-icon{position:relative}
+.input-icon input{padding-left:2.4rem}
+.input-icon .icon{position:absolute;left:.7rem;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;width:16px;height:16px}
+
+/* ── TRIP TYPE ── */
+.trip-type{display:flex;gap:.5rem;margin-bottom:1rem}
+.trip-btn{padding:.4rem 1rem;border-radius:20px;border:1.5px solid rgba(255,255,255,.4);background:transparent;color:#fff;cursor:pointer;font-size:.85rem;transition:.2s}
+.trip-btn.active{background:#fff;color:var(--primary);font-weight:600}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:.4rem;padding:.65rem 1.4rem;border-radius:8px;font-size:.9rem;font-weight:600;cursor:pointer;border:none;transition:.2s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--primary)}
+.btn-success{background:var(--success);color:#fff}
+.btn-success:hover{background:#229954}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text)}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-sm{padding:.4rem .9rem;font-size:.82rem}
+.btn-hero{background:#fff;color:var(--primary);font-size:1rem;padding:.75rem 2rem;border-radius:8px;font-weight:700}
+.btn-hero:hover{background:#eaf3fc}
+.btn-block{width:100%;justify-content:center}
+
+/* ── RESULTS ── */
+.results-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
+.results-count{font-size:.9rem;color:var(--text-light)}
+.sort-row{display:flex;gap:.4rem;align-items:center;flex-wrap:wrap}
+.sort-label{font-size:.78rem;color:var(--muted);margin-right:.2rem}
+.sort-btn{padding:.3rem .85rem;border-radius:6px;border:1.5px solid var(--border);background:#fff;color:var(--text-light);cursor:pointer;font-size:.82rem;transition:.2s;display:inline-flex;align-items:center;gap:.3rem;user-select:none}
+.sort-btn:hover{border-color:var(--accent);color:var(--accent)}
+.sort-btn .rank{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:var(--accent);color:#fff;font-size:.65rem;font-weight:700;display:none}
+.sort-btn.rank-1{border-color:var(--accent);background:#eaf3fc;color:var(--accent);font-weight:600}
+.sort-btn.rank-1 .rank{display:inline-flex;background:var(--accent)}
+.sort-btn.rank-2{border-color:#7fb3d3;background:#f4f9fd;color:#2e7dab;font-weight:500}
+.sort-btn.rank-2 .rank{display:inline-flex;background:#7fb3d3}
+.sort-btn.rank-3{border-color:#a9cce3;background:#fafcfe;color:#5a9abd}
+.sort-btn.rank-3 .rank{display:inline-flex;background:#a9cce3}
+.sort-asc::after{content:' ↑';font-size:.7rem;opacity:.7}
+.sort-desc::after{content:' ↓';font-size:.7rem;opacity:.7}
+.sort-clear{padding:.25rem .6rem;border-radius:6px;border:1px solid var(--border);background:none;color:var(--muted);cursor:pointer;font-size:.75rem}
+.sort-clear:hover{color:var(--danger);border-color:var(--danger)}
+
+/* ── FLIGHT CARD ── */
+.flight-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:1.2rem 1.5rem;margin-bottom:1rem;display:grid;grid-template-columns:1fr auto;gap:1rem;align-items:center;cursor:pointer;transition:.2s}
+.flight-card:hover{border-color:var(--accent);box-shadow:0 4px 16px rgba(46,134,193,.15)}
+.flight-card.selected{border-color:var(--accent2);background:rgba(26,188,156,.04)}
+.flight-route{display:flex;align-items:center;gap:1.5rem}
+.flight-city{font-size:1.3rem;font-weight:700}
+.flight-time{font-size:.85rem;color:var(--text-light)}
+.flight-arrow{display:flex;flex-direction:column;align-items:center;gap:.2rem;flex:1;min-width:80px}
+.flight-line{height:2px;background:var(--border);width:100%;position:relative}
+.flight-line::after{content:'▶';position:absolute;right:-6px;top:-7px;font-size:.7rem;color:var(--muted)}
+.flight-dur{font-size:.75rem;color:var(--muted);text-align:center}
+.flight-info{font-size:.8rem;color:var(--text-light);margin-top:.2rem}
+.flight-price{text-align:right}
+.flight-price .amount{font-size:1.4rem;font-weight:700;color:var(--primary)}
+.flight-price .per{font-size:.75rem;color:var(--muted)}
+.airline-badge{display:inline-flex;align-items:center;gap:.3rem;background:var(--bg);border-radius:6px;padding:.2rem .6rem;font-size:.8rem;font-weight:500}
+.stops-badge{font-size:.75rem;padding:.15rem .5rem;border-radius:10px;background:#fef9e7;color:var(--warn);border:1px solid #f9e79f}
+.stops-badge.direct{background:#eafaf1;color:var(--success);border-color:#a9dfbf}
+
+/* ── HOTEL CARD ── */
+.hotel-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:1rem;display:grid;grid-template-columns:200px 1fr auto;cursor:pointer;transition:.2s}
+.hotel-card:hover{border-color:var(--accent);box-shadow:0 4px 16px rgba(46,134,193,.15)}
+@media(max-width:600px){.hotel-card{grid-template-columns:1fr}}
+.hotel-img{width:200px;height:140px;object-fit:cover;background:linear-gradient(135deg,#d6eaf8,#a9cce3)}
+.hotel-img-placeholder{width:200px;height:140px;display:flex;align-items:center;justify-content:center;font-size:3rem;background:linear-gradient(135deg,#d6eaf8,#a9cce3)}
+.hotel-info{padding:1rem 1.2rem}
+.hotel-name{font-size:1.05rem;font-weight:700;margin-bottom:.3rem}
+.stars{color:#f39c12;font-size:.9rem}
+.hotel-loc{font-size:.82rem;color:var(--text-light);margin:.2rem 0}
+.hotel-tags{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.5rem}
+.tag{font-size:.75rem;padding:.15rem .6rem;border-radius:10px;background:#eaf3fc;color:var(--accent)}
+.hotel-price-col{padding:1rem 1.2rem;display:flex;flex-direction:column;align-items:flex-end;justify-content:space-between;min-width:140px}
+.hotel-price .amount{font-size:1.3rem;font-weight:700;color:var(--primary)}
+.hotel-price .per{font-size:.75rem;color:var(--muted)}
+.rating-badge{background:var(--accent);color:#fff;border-radius:8px;padding:.25rem .6rem;font-size:.85rem;font-weight:700}
+.hotel-rate-list{display:grid;gap:.45rem;margin-top:.7rem}
+.hotel-rate-option{background:#fff;border:1px solid var(--border);border-radius:12px;padding:.7rem .8rem;text-align:left;cursor:pointer;transition:.18s}
+.hotel-rate-option:hover{border-color:#8fb9da;box-shadow:0 4px 14px rgba(31,79,130,.08)}
+.hotel-rate-option.active{border-color:#2e86c1;background:#eef6ff;box-shadow:0 6px 16px rgba(46,134,193,.12)}
+.hotel-rate-top{display:flex;justify-content:space-between;gap:.8rem;align-items:flex-start;font-size:.88rem}
+.hotel-rate-meta{font-size:.77rem;color:var(--primary);margin-top:.25rem}
+.hotel-rate-note{font-size:.74rem;color:var(--text-light);margin-top:.25rem;line-height:1.45}
+.hotel-rate-summary{font-size:.76rem;color:var(--text-light);line-height:1.55;margin-top:.5rem}
+.hotel-detail-panel{grid-column:1/-1;border-top:1px solid var(--border);background:linear-gradient(180deg,#fbfdff 0%,#f4f9fd 100%);padding:1rem 1.2rem 1.2rem}
+.hotel-detail-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.7rem}
+.hotel-detail-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:.8rem .9rem}
+.hotel-detail-card-wide{grid-column:span 2}
+.hotel-detail-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--text-light);margin-bottom:.25rem}
+.hotel-detail-value{font-size:.92rem;font-weight:700;color:var(--primary);line-height:1.45}
+.hotel-detail-note{font-size:.8rem;color:var(--text-light);line-height:1.55;margin-top:.25rem}
+.hotel-detail-chip-row{display:flex;gap:.35rem;flex-wrap:wrap;margin-top:.45rem}
+.hotel-detail-chip{display:inline-flex;align-items:center;padding:.2rem .55rem;border-radius:999px;background:#eef6ff;border:1px solid #cfe2ff;color:#1f4f82;font-size:.72rem;font-weight:600}
+
+/* ── CAR CARD ── */
+.car-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:1.2rem 1.5rem;margin-bottom:1rem;display:grid;grid-template-columns:100px 1fr auto;gap:1rem;align-items:center;cursor:pointer;transition:.2s}
+.car-card:hover{border-color:var(--accent);box-shadow:0 4px 16px rgba(46,134,193,.15)}
+.car-icon{font-size:3rem;text-align:center}
+.car-name{font-size:1rem;font-weight:700}
+.car-class{font-size:.8rem;color:var(--text-light);margin-bottom:.4rem}
+.car-features{display:flex;gap:.5rem;flex-wrap:wrap}
+.car-feat{font-size:.75rem;padding:.1rem .5rem;border-radius:8px;background:#f4f6f9;color:var(--text-light)}
+
+/* ── BOOKING FLOW ── */
+.stepper{display:flex;gap:0;margin-bottom:2rem}
+.step{flex:1;display:flex;flex-direction:column;align-items:center;position:relative}
+.step::after{content:'';position:absolute;top:14px;left:50%;width:100%;height:2px;background:var(--border);z-index:0}
+.step:last-child::after{display:none}
+.step-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;position:relative;z-index:1;transition:.3s}
+.step-dot.done{background:var(--success);border-color:var(--success);color:#fff}
+.step-dot.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.step-label{font-size:.75rem;margin-top:.3rem;color:var(--text-light);text-align:center}
+.step.active .step-label{color:var(--accent);font-weight:600}
+
+/* ── ITINERARY ── */
+.day-block{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:1rem;overflow:hidden}
+.day-header{background:linear-gradient(135deg,var(--primary-dark),var(--accent));color:#fff;padding:.8rem 1.2rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+.day-title{font-weight:600}
+.activity-list{padding:.8rem}
+.activity-item{display:flex;gap:.8rem;align-items:flex-start;padding:.6rem 0;border-bottom:1px solid var(--border)}
+.activity-item:last-child{border-bottom:none}
+.activity-time{font-size:.8rem;color:var(--accent);font-weight:600;min-width:55px}
+.activity-name{font-size:.9rem;font-weight:500}
+.activity-desc{font-size:.8rem;color:var(--text-light)}
+.add-activity{display:flex;gap:.5rem;margin-top:.5rem}
+
+/* ── BOOKINGS TABLE ── */
+.bookings-table{width:100%;border-collapse:collapse;font-size:.88rem}
+.bookings-table th{text-align:left;padding:.6rem 1rem;background:var(--bg);color:var(--text-light);font-size:.78rem;text-transform:uppercase;letter-spacing:.04em}
+.bookings-table td{padding:.75rem 1rem;border-top:1px solid var(--border)}
+.booking-section-head{display:flex;justify-content:space-between;align-items:flex-end;gap:1rem;flex-wrap:wrap;margin:.2rem 0 .9rem}
+.booking-entry-list{display:grid;gap:.9rem}
+.booking-entry{border:1px solid var(--border);border-radius:14px;padding:1rem 1.05rem;background:#fff;box-shadow:var(--shadow)}
+.booking-entry-hotel{background:linear-gradient(180deg,#ffffff 0%,#f6fbf8 100%);border-color:#b7e4c7}
+.booking-entry-head{display:flex;justify-content:space-between;gap:1rem;align-items:flex-start;flex-wrap:wrap}
+.booking-entry-kicker{font-size:.74rem;text-transform:uppercase;letter-spacing:.05em;color:var(--success);font-weight:700}
+.booking-entry-title{font-size:1.02rem;font-weight:700;color:var(--primary)}
+.booking-entry-subtitle{font-size:.82rem;color:var(--text-light);margin-top:.15rem}
+.booking-code{display:inline-flex;align-items:center;padding:.26rem .7rem;border-radius:999px;background:#eef6ff;border:1px solid #cfe2ff;color:#1f4f82;font-size:.76rem;font-weight:700;font-family:Consolas,monospace}
+.booking-entry-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.65rem;margin-top:.9rem}
+.booking-mini-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:.7rem .8rem}
+.booking-mini-card-wide{grid-column:span 2}
+.booking-mini-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--text-light);margin-bottom:.2rem}
+.booking-mini-value{font-size:.9rem;font-weight:600;color:var(--text)}
+.booking-entry-note{margin-top:.75rem;padding:.7rem .85rem;border-radius:10px;background:#f7fbfe;border:1px solid #d6e8f5;color:var(--text-light);font-size:.82rem;line-height:1.55}
+.booking-entry-actions{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.85rem}
+.booking-row-request td{background:#fff}
+.booking-row-legacy-hotel td{background:#fbfcfd}
+.status-pill{padding:.2rem .7rem;border-radius:10px;font-size:.78rem;font-weight:600}
+.status-received{background:#eaf3fc;color:#1a5276}
+.status-reviewing{background:#fff8e8;color:#b9770e}
+.status-waiting{background:#fef5e7;color:#af601a}
+.status-redirected{background:#eef6ff;color:#1f4f82}
+.status-external-completed{background:#e8f6f3;color:#117864}
+.status-completed{background:#eafaf1;color:var(--success)}
+.status-confirmed{background:#eafaf1;color:var(--success)}
+.status-pending{background:#fef9e7;color:var(--warn)}
+.status-cancelled{background:#fdedec;color:var(--danger)}
+.status-archived{background:#f2f4f4;color:#566573}
+
+/* ── MODAL ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:var(--radius);max-width:560px;width:90%;max-height:90vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.2)}
+.modal-header{background:linear-gradient(135deg,var(--primary-dark),var(--accent));color:#fff;padding:1.2rem 1.5rem;border-radius:var(--radius) var(--radius) 0 0;display:flex;justify-content:space-between;align-items:center}
+.modal-body{padding:1.5rem}
+.modal-footer{padding:1rem 1.5rem;border-top:1px solid var(--border);display:flex;gap:.75rem;justify-content:flex-end}
+.close-btn{background:none;border:none;color:#fff;font-size:1.3rem;cursor:pointer;line-height:1}
+
+/* ── MISC ── */
+.price-summary{background:#f4f9fd;border:1px solid #d4e8f5;border-radius:8px;padding:1rem;margin:1rem 0}
+.price-row{display:flex;justify-content:space-between;font-size:.9rem;padding:.25rem 0}
+.price-row.total{font-weight:700;font-size:1rem;border-top:1px solid var(--border);padding-top:.5rem;margin-top:.25rem}
+.booking-confirm-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.7rem;margin-top:1rem}
+.booking-confirm-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:.8rem}
+.booking-confirm-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--text-light);margin-bottom:.25rem}
+.booking-confirm-value{font-size:.92rem;font-weight:700;color:var(--text);line-height:1.45}
+.booking-confirm-note{margin-top:.75rem;padding:.8rem .9rem;border-radius:10px;background:#f7fbfe;border:1px solid #d6e8f5;color:var(--text-light);font-size:.82rem;line-height:1.55}
+.booking-detail-panel{margin-top:.85rem;border:1px solid var(--border);border-radius:12px;background:#fcfdff}
+.booking-detail-panel summary{cursor:pointer;list-style:none;padding:.8rem .95rem;font-size:.82rem;font-weight:700;color:var(--primary)}
+.booking-detail-panel summary::-webkit-details-marker{display:none}
+.booking-detail-grid{padding:0 .95rem .95rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.65rem}
+.booking-detail-sections{padding:0 .95rem .95rem;display:grid;gap:.8rem}
+.booking-detail-block{background:#fff;border:1px solid var(--border);border-radius:12px;padding:.85rem .9rem}
+.booking-detail-block-title{font-size:.76rem;text-transform:uppercase;letter-spacing:.05em;color:var(--primary);font-weight:700;margin-bottom:.65rem}
+.booking-detail-callout{padding:.75rem .8rem;border-radius:10px;background:#f7fbfe;border:1px solid #d6e8f5;color:var(--text-light);font-size:.82rem;line-height:1.55}
+.booking-timeline{display:grid;gap:.6rem}
+.booking-timeline-item{display:grid;grid-template-columns:16px 1fr;gap:.65rem;align-items:flex-start}
+.booking-timeline-dot{width:10px;height:10px;border-radius:50%;background:var(--accent);margin-top:.25rem;box-shadow:0 0 0 4px rgba(46,134,193,.12)}
+.booking-timeline-title{font-size:.88rem;font-weight:700;color:var(--text)}
+.booking-timeline-meta{font-size:.78rem;color:var(--text-light);margin-top:.1rem}
+.hotel-checkout-rail{background:linear-gradient(180deg,#eef6ff 0%,#f7fbfe 100%);border:1px solid #cfe2ff;border-radius:12px;padding:.9rem 1rem;margin-bottom:1rem}
+.hotel-checkout-title{font-size:.76rem;text-transform:uppercase;letter-spacing:.05em;color:#1f4f82;font-weight:700;margin-bottom:.55rem}
+.hotel-checkout-row{display:flex;justify-content:space-between;gap:.8rem;padding:.3rem 0;font-size:.84rem;color:var(--text-light)}
+.hotel-checkout-row strong{color:var(--text);text-align:right;max-width:62%}
+.alert{padding:.75rem 1rem;border-radius:8px;font-size:.88rem;margin-bottom:1rem}
+.alert-success{background:#eafaf1;border:1px solid #a9dfbf;color:#1e8449}
+.alert-info{background:#eaf3fc;border:1px solid #a9cce3;color:#1a5276}
+.search-loader{display:none;text-align:center;padding:2rem;color:var(--muted)}
+.search-loader.show{display:block}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{display:inline-block;width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:.5rem}
+.spinner-sm{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:.4rem}
+.empty-state{text-align:center;padding:3rem;color:var(--muted)}
+.empty-state .icon{font-size:3rem;margin-bottom:.75rem}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:600px){.grid-2{grid-template-columns:1fr}}
+.map-placeholder{background:linear-gradient(135deg,#d6eaf8,#a9cce3);border-radius:8px;height:200px;display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:.9rem;font-weight:500;margin-bottom:1rem}
+
+/* ── MVP HUB ── */
+.overview-hero{background:linear-gradient(135deg,#0d2b45 0%,#176087 55%,#7db9d6 100%);color:#fff;border-radius:20px;padding:2.2rem;position:relative;overflow:hidden;margin-bottom:1.5rem}
+.overview-hero::before,.overview-hero::after{content:'';position:absolute;border-radius:50%;background:rgba(255,255,255,.1);filter:blur(2px)}
+.overview-hero::before{width:220px;height:220px;top:-70px;right:-40px}
+.overview-hero::after{width:160px;height:160px;bottom:-60px;left:-40px}
+.overview-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:1rem}
+.overview-panel{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.2);border-radius:16px;padding:1rem;backdrop-filter:blur(6px)}
+.pill-row{display:flex;gap:.5rem;flex-wrap:wrap}
+.mini-pill{display:inline-flex;align-items:center;gap:.35rem;padding:.35rem .75rem;border-radius:999px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.18);font-size:.8rem}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.8rem;margin-top:1rem}
+.kpi-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:1rem;box-shadow:var(--shadow)}
+.kpi-card .value{font-size:1.45rem;font-weight:800;color:var(--primary)}
+.kpi-card .label{font-size:.8rem;color:var(--text-light);margin-top:.25rem}
+.split-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:1rem}
+
+/* Timeline Styles */
+.timeline-container { position: relative; padding-left: 1.5rem; margin-top: 1rem; }
+.timeline-container::before { content: ''; position: absolute; left: 0.35rem; top: 0; bottom: 0; width: 2px; background: var(--border); }
+.timeline-item { position: relative; margin-bottom: 1.5rem; font-size: 0.88rem; }
+.timeline-item::before { content: ''; position: absolute; left: -1.45rem; top: 0.2rem; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); border: 2px solid #fff; z-index: 1; }
+.timeline-date { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; margin-bottom: 0.2rem; }
+.timeline-content { background: #f8f9fa; padding: 0.6rem 0.8rem; border-radius: 8px; border: 1px solid var(--border); }
+.timeline-type { font-weight: 700; color: var(--primary); margin-bottom: 0.1rem; }
+
+/* Expense Summary Styles */
+.expense-row { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+.expense-row:last-child { border-bottom: none; }
+.expense-cat { display: flex; align-items: center; gap: 0.5rem; }
+.expense-val { font-weight: 700; }
+.expense-total { margin-top: 0.8rem; padding-top: 0.8rem; border-top: 2px solid var(--border); font-weight: 700; font-size: 1rem; color: var(--primary); }
+.roadmap-list,.model-list,.community-list{display:grid;gap:.8rem}
+.roadmap-item,.model-item,.community-item,.insight-card,.recommendation-card,.provider-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:1rem;box-shadow:var(--shadow)}
+.roadmap-item strong,.model-item strong,.community-item strong{display:block;margin-bottom:.3rem;color:var(--primary)}
+.status-chip{display:inline-flex;align-items:center;gap:.35rem;border-radius:999px;padding:.2rem .65rem;font-size:.74rem;font-weight:700}
+.status-live{background:#eafaf1;color:var(--success)}
+.status-next{background:#fff8e8;color:#b9770e}
+.status-later{background:#eef3f8;color:#5d6d7e}
+.section-head{display:flex;justify-content:space-between;gap:1rem;align-items:flex-end;margin-bottom:.8rem;flex-wrap:wrap}
+.section-head p{font-size:.85rem;color:var(--text-light)}
+.stack-col{display:grid;gap:1rem}
+
+/* ── INSIGHTS & COMPARISON ── */
+.insight-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.8rem;margin-bottom:1rem}
+.insight-card{background:linear-gradient(180deg,#fff 0%,#f7fbfe 100%)}
+.insight-label{font-size:.74rem;color:var(--text-light);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.3rem}
+.insight-value{font-size:1.2rem;font-weight:800;color:var(--primary)}
+.insight-sub{font-size:.8rem;color:var(--text-light);margin-top:.3rem}
+.comparison-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.8rem;margin-bottom:1rem}
+.provider-card{background:linear-gradient(180deg,#fff 0%,#fbfcfd 100%)}
+.provider-top{display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem;margin-bottom:.5rem}
+.provider-name{font-weight:700}
+.provider-price{font-size:1.2rem;font-weight:800;color:var(--primary)}
+.provider-delta{font-size:.78rem;color:var(--success);font-weight:600}
+.provider-delta.loss{color:var(--danger)}
+.score-badge{display:inline-flex;align-items:center;justify-content:center;min-width:48px;height:32px;padding:0 .6rem;border-radius:999px;background:#eaf3fc;color:var(--accent);font-size:.82rem;font-weight:800}
+.score-badge.top{background:#eafaf1;color:var(--success)}
+.score-line{display:flex;gap:.45rem;flex-wrap:wrap;margin-top:.45rem}
+.score-tag{font-size:.72rem;padding:.18rem .55rem;border-radius:999px;background:#f4f6f9;color:var(--text-light)}
+.match-pill{display:inline-flex;align-items:center;gap:.35rem;background:#eef8f2;color:#1e8449;border:1px solid #b7e4c7;padding:.22rem .65rem;border-radius:999px;font-size:.74rem;font-weight:700}
+.recommendation-card{border:1.5px solid #b9ddf3;background:linear-gradient(135deg,#f7fbfe,#eef8f2)}
+.recommendation-card h3{color:var(--primary);margin-bottom:.45rem}
+.recommendation-card p{font-size:.86rem;color:var(--text-light);margin-bottom:.6rem}
+.meta-list{display:flex;gap:.45rem;flex-wrap:wrap}
+.meta-list span{font-size:.76rem;padding:.2rem .55rem;border-radius:999px;background:#fff;border:1px solid var(--border);color:var(--text-light)}
+
+/* ── COMMUNITY ── */
+.community-hero{background:linear-gradient(135deg,#fffaf1,#f1f8fb);border:1px solid #d9e9f2;border-radius:18px;padding:1.5rem;margin-bottom:1.2rem}
+.feed-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:1rem}
+.forum-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:1rem;box-shadow:var(--shadow)}
+.forum-meta{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.5rem}
+.forum-meta span{font-size:.74rem;border-radius:999px;padding:.2rem .6rem;background:#f4f6f9;color:var(--text-light)}
+.review-stars{color:#f39c12;font-size:.88rem}
+.monetization-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:.8rem}
+.mvp-note{font-size:.8rem;color:var(--text-light);line-height:1.5}
+@media(max-width:900px){
+  .overview-grid,.split-grid,.feed-grid{grid-template-columns:1fr}
+  .kpi-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:560px){
+  .kpi-grid{grid-template-columns:1fr}
+}
+
+/* ── DESTINATION FINDER ── */
+.mood-section{margin-bottom:1.4rem}
+.mood-title{font-size:.85rem;font-weight:700;color:var(--text-light);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.6rem}
+.mood-pills{display:flex;flex-wrap:wrap;gap:.5rem}
+.mood-pill{padding:.45rem 1rem;border-radius:20px;border:1.5px solid var(--border);background:#fff;cursor:pointer;font-size:.88rem;transition:.2s;user-select:none}
+.mood-pill:hover{border-color:var(--accent);color:var(--accent)}
+.mood-pill.sel{background:var(--accent);color:#fff;border-color:var(--accent)}
+.dest-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;margin-top:1rem}
+.dest-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:.2s}
+.dest-card:hover{border-color:var(--accent);box-shadow:0 6px 20px rgba(46,134,193,.18);transform:translateY(-2px)}
+.dest-banner{height:120px;display:flex;align-items:center;justify-content:center;font-size:3.5rem;position:relative}
+.dest-match{position:absolute;top:.5rem;right:.5rem;background:var(--success);color:#fff;border-radius:10px;padding:.15rem .55rem;font-size:.75rem;font-weight:700}
+.dest-body{padding:1rem}
+.dest-name{font-size:1.05rem;font-weight:700;margin-bottom:.2rem}
+.dest-tags{display:flex;flex-wrap:wrap;gap:.3rem;margin:.4rem 0}
+.dest-info{font-size:.8rem;color:var(--text-light);margin-top:.3rem}
+.dest-price{font-size:.9rem;font-weight:600;color:var(--primary);margin-top:.4rem}
+
+/* ── PACKLIST ── */
+.pack-category{background:#fff;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:.8rem;overflow:hidden}
+.pack-cat-header{display:flex;align-items:center;justify-content:space-between;padding:.7rem 1rem;background:var(--bg);cursor:pointer;font-weight:600;font-size:.9rem}
+.pack-cat-header .cat-icon{font-size:1.1rem;margin-right:.4rem}
+.pack-cat-progress{font-size:.75rem;color:var(--muted);margin-left:auto;margin-right:.5rem}
+.pack-items{padding:.5rem 1rem .8rem}
+.pack-item{display:flex;align-items:center;gap:.6rem;padding:.35rem 0;border-bottom:1px solid var(--border)}
+.pack-item:last-child{border-bottom:none}
+.pack-item input[type=checkbox]{width:16px;height:16px;accent-color:var(--accent);cursor:pointer;flex-shrink:0}
+.pack-item label{font-size:.88rem;cursor:pointer;flex:1}
+.pack-item.checked label{text-decoration:line-through;color:var(--muted)}
+.pack-item .del-item{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.85rem;padding:.1rem .3rem;opacity:0;transition:.2s}
+.pack-item:hover .del-item{opacity:1}
+.pack-progress-bar{height:4px;background:var(--border);border-radius:2px;margin-bottom:.8rem}
+.pack-progress-fill{height:100%;background:var(--accent2);border-radius:2px;transition:.4s}
+.pack-add-row{display:flex;gap:.5rem;padding:.5rem 1rem .7rem}
+
+/* ── BUDGET PLANER ── */
+.budget-overview{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.5rem}
+@media(max-width:600px){.budget-overview{grid-template-columns:1fr 1fr}}
+.budget-kpi{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:1rem;text-align:center}
+.budget-kpi .kpi-val{font-size:1.5rem;font-weight:700;color:var(--primary)}
+.budget-kpi .kpi-label{font-size:.78rem;color:var(--muted);margin-top:.2rem}
+.budget-kpi.over .kpi-val{color:var(--danger)}
+.budget-kpi.ok .kpi-val{color:var(--success)}
+.budget-row{display:flex;align-items:center;gap:.8rem;padding:.6rem 0;border-bottom:1px solid var(--border)}
+.budget-row:last-child{border-bottom:none}
+.budget-cat-icon{font-size:1.2rem;width:28px;text-align:center}
+.budget-cat-name{flex:1;font-size:.9rem;font-weight:500}
+.budget-bar-wrap{flex:2;min-width:80px}
+.budget-bar{height:8px;background:var(--border);border-radius:4px;overflow:hidden}
+.budget-bar-fill{height:100%;border-radius:4px;transition:.4s;background:var(--accent)}
+.budget-bar-fill.over{background:var(--danger)}
+.budget-amount{font-size:.9rem;font-weight:600;color:var(--primary);min-width:70px;text-align:right}
+.budget-input{width:90px;padding:.3rem .5rem;border:1.5px solid var(--border);border-radius:6px;font-size:.88rem;text-align:right}
+.budget-input:focus{outline:none;border-color:var(--accent)}
+.weather-widget{display:flex;gap:1rem;overflow-x:auto;padding-bottom:.5rem}
+.weather-day{background:var(--bg);border-radius:8px;padding:.75rem;min-width:80px;text-align:center;flex-shrink:0}
+.weather-icon{font-size:1.5rem}
+.weather-temp{font-size:.9rem;font-weight:700}
+.weather-label{font-size:.75rem;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <a class="logo" href="#">
+    <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="14" cy="14" r="12"/>
+      <path d="M14 2c0 0-6 5-6 12s6 12 6 12"/>
+      <path d="M14 2c0 0 6 5 6 12s-6 12-6 12"/>
+      <line x1="2" y1="14" x2="26" y2="14"/>
+      <path d="M8 6l8 16M20 6l-8 16" opacity=".4"/>
+    </svg>
+    TravelLogik
+    <span class="tagline">Professionelle Produkt-Beta fuer Reiseplanung und erste Selbstbuchung</span>
+  </a>
+  <div class="header-right">
+    <button class="my-bookings-btn" onclick="showPage('page-bookings')">📋 Buchungen</button>
+    <button class="my-bookings-btn" onclick="openSettings()" title="Datenquellen" id="api-status-btn">⚙️ Daten</button>
+  </div>
+</header>
+
+<!-- NAV -->
+<nav>
+  <button class="nav-tab active" data-page="page-overview" onclick="showPage('page-overview')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 13h8V3H3z"/><path d="M13 21h8v-6h-8z"/><path d="M13 11h8V3h-8z"/><path d="M3 21h8v-4H3z"/></svg>
+    Produktstatus
+  </button>
+  <button class="nav-tab" data-page="page-flights" onclick="showPage('page-flights')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg>
+    Flüge
+  </button>
+  <button class="nav-tab" data-page="page-hotels" onclick="showPage('page-hotels')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    Hotels
+  </button>
+  <button class="nav-tab" data-page="page-cars" onclick="showPage('page-cars')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h6l2 5v3h-8V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+    Mietwagen
+  </button>
+  <button class="nav-tab" data-page="page-transfer" onclick="showPage('page-transfer')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 12l4-4M3 12l4 4M21 12l-4-4M21 12l-4 4"/></svg>
+    Transfer
+  </button>
+  <button class="nav-tab" data-page="page-planner" onclick="showPage('page-planner')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    Reiseplaner
+  </button>
+  <button class="nav-tab" data-page="page-bookings" onclick="showPage('page-bookings')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
+    Buchungen
+  </button>
+  <button class="nav-tab" data-page="page-community" onclick="showPage('page-community')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    Community
+  </button>
+  <button class="nav-tab" data-page="page-finder" onclick="showPage('page-finder')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+    Destination Finder
+  </button>
+  <button class="nav-tab" data-page="page-packlist" onclick="showPage('page-packlist')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+    Packliste
+  </button>
+  <button class="nav-tab" data-page="page-budget" onclick="showPage('page-budget')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+    Budgetplaner
+  </button>
+</nav>
+
+<!-- TRIP CONTEXT BAR -->
+<div id="trip-bar">
+  <div class="trip-bar-inner">
+    <div class="trip-summary">
+      <span id="tb-route">–</span>
+      <span class="sep">|</span>
+      <span id="tb-dates">–</span>
+      <span class="sep">|</span>
+      <span id="tb-pax">–</span>
+    </div>
+    <div class="trip-modules">
+      <span class="trip-mod" id="tm-flights" onclick="showPage('page-flights')"><span class="mod-check">✈️</span>Flug</span>
+      <span class="trip-mod" id="tm-hotels"  onclick="showPage('page-hotels')"><span class="mod-check">🏨</span>Hotel</span>
+      <span class="trip-mod" id="tm-cars"    onclick="showPage('page-cars')"><span class="mod-check">🚗</span>Mietwagen</span>
+      <span class="trip-mod" id="tm-transfer" onclick="showPage('page-transfer')"><span class="mod-check">🚌</span>Transfer</span>
+      <span class="trip-mod" id="tm-planner" onclick="showPage('page-planner')"><span class="mod-check">📅</span>Reiseplaner</span>
+      <span class="trip-mod" id="tm-packlist" onclick="showPage('page-packlist')"><span class="mod-check">🧳</span>Packliste</span>
+      <span class="trip-mod" id="tm-budget"  onclick="showPage('page-budget')"><span class="mod-check">💰</span>Budget</span>
+    </div>
+    <button class="trip-clear" onclick="clearTrip()">✕ Reise zurücksetzen</button>
+  </div>
+</div>
+
+<main>
+
+<!-- ════════════════════════════════ MVP HUB ════════════════════════════════ -->
+<div class="page active" id="page-overview">
+  <section class="product-banner">
+    <div class="product-banner-head">
+      <div>
+        <div class="product-badges">
+          <span class="product-badge beta">Beta fuer erste externe Nutzer</span>
+          <span class="product-badge demo" id="hosting-badge">Noch nicht auf externer URL</span>
+          <span class="product-badge local" id="storage-badge">Speicherung im Browser</span>
+          <span class="product-badge demo" id="data-mode-badge">Demo- und Live-Daten klar getrennt</span>
+          <span class="product-badge demo" id="pilot-mode-badge">Pilot-Uebergabe noch nicht konfiguriert</span>
+        </div>
+        <div class="product-banner-copy" style="margin-top:.7rem">
+          TravelLogik ist aktuell auf eine hostbare Beta mit erster echter Selbstbuchungsroute ausgerichtet: Suche, Vergleich und Empfehlung funktionieren bereits nutzerorientiert; klassische Hotels koennen direkt in TravelLogik gebucht werden, waehrend Fluege, Mietwagen und Transfers weiterhin ehrlich als Anfrage oder Vorbereitung gefuehrt werden.
+        </div>
+        <div class="beta-inline-note" id="public-pilot-note" style="margin-top:.8rem">Fuer externe Tests sollte TravelLogik ueber eine stabile URL bereitstehen. Die Hotelroute darf bereits wie Selbstbuchung sprechen; Anfragepfade brauchen weiterhin klare Rueckmeldeversprechen.</div>
+      </div>
+      <div class="inline-note" style="max-width:280px">
+        <strong style="display:block;color:var(--primary);margin-bottom:.25rem">Wichtige Einordnung</strong>
+        Die App speichert im aktuellen Stand lokal im Browser. Klassische Hotels laufen bereits als lokale Selbstbuchung; alles andere bleibt bewusst vorbereitet und wird noch nicht als Live-Buchung versprochen.
+      </div>
+    </div>
+  </section>
+  <section class="overview-hero">
+    <div class="overview-grid">
+      <div>
+        <div class="pill-row" style="margin-bottom:.9rem">
+          <span class="mini-pill">Positionierung: Reiseplanung mit klarem Preisvergleich</span>
+          <span class="mini-pill">Hostbare Beta statt reine lokale Demo</span>
+          <span class="mini-pill">Module behalten, Produktreife erhoehen</span>
+        </div>
+        <h1 style="font-size:2rem;line-height:1.1;margin-bottom:.75rem">TravelLogik fuehrt Reisende von der ersten Suche bis zur ersten echten Selbstbuchung oder zu einer glaubwuerdigen Anfrage.</h1>
+        <p style="max-width:720px;font-size:.96rem;line-height:1.7;opacity:.9">Im aktuellen Produktstand liegt der Fokus auf vertrauenswuerdiger Orientierung mit echter Produktgrenze: Angebote finden, Preis-Leistung transparent einordnen, Hotels als externe Buchungsfaelle fuer Reise- und Kosten-Tracking fuehren und fuer andere Kategorien bewusst eine reale Anfrage oder Weitergabe vorbereiten. Alles, was heute noch Demo oder vorbereitet ist, wird im UI klar gekennzeichnet.</p>
+        <div style="display:flex;gap:.7rem;flex-wrap:wrap;margin-top:1.1rem">
+          <button class="btn btn-hero" onclick="showPage('page-flights')">Mit der Suche starten</button>
+          <button class="btn btn-outline" style="background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.35)" onclick="document.getElementById('beta-readiness')?.scrollIntoView({behavior:'smooth',block:'start'})">Beta-Status ansehen</button>
+        </div>
+      </div>
+      <div class="overview-panel">
+        <div style="font-size:.78rem;letter-spacing:.05em;text-transform:uppercase;opacity:.75;margin-bottom:.4rem">Aktives Reiseprofil</div>
+        <div class="form-group" style="margin-bottom:.7rem">
+          <label style="color:rgba(255,255,255,.78)">Reisestil</label>
+          <select id="pref-style" onchange="saveTravelerProfile()">
+            <option value="smart">Smart sparen</option>
+            <option value="balanced">Ausgewogen</option>
+            <option value="comfort">Komfort zuerst</option>
+          </select>
+        </div>
+        <div class="form-row cols-2" style="margin-bottom:.7rem">
+          <div class="form-group">
+            <label style="color:rgba(255,255,255,.78)">Budgetniveau</label>
+            <select id="pref-budget" onchange="saveTravelerProfile()">
+              <option value="tight">Kompakt</option>
+              <option value="mid">Mittel</option>
+              <option value="premium">Premium</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label style="color:rgba(255,255,255,.78)">Reisezweck</label>
+            <select id="pref-purpose" onchange="saveTravelerProfile()">
+              <option value="leisure">Freizeit</option>
+              <option value="family">Familie</option>
+              <option value="business">Business</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label style="color:rgba(255,255,255,.78)">Wichtigstes Kriterium</label>
+          <select id="pref-priority" onchange="saveTravelerProfile()">
+            <option value="value">Bestes Preis-Leistungs-Verhältnis</option>
+            <option value="price">Niedrigster Preis</option>
+            <option value="comfort">Maximaler Komfort</option>
+            <option value="flexibility">Flexible Optionen</option>
+          </select>
+        </div>
+        <div class="mvp-note" style="color:rgba(255,255,255,.82);margin-top:.8rem">Diese Praeferenzen beeinflussen Empfehlungen, Value-Scoring und Sortierung. So wirkt die Beta bereits persoenlicher statt generisch.</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="notice-grid" id="beta-readiness">
+    <div class="notice-card">
+      <strong>Was heute belastbar funktioniert</strong>
+      <p>Flug-, Hotel-, Mietwagen- und Transfermodule fuehren durch Suche, Vergleich und naechste Schritte. Die Hotelstrecke zeigt bewusst nur externe Buchungspfade und lokales Tracking fuer Reiseverlauf und Kosten.</p>
+    </div>
+    <div class="notice-card">
+      <strong>Was bewusst als Beta gekennzeichnet ist</strong>
+      <p>Lokale Speicherung, pilotische Anfrage-Uebergaben und einzelne Datenquellen laufen noch nicht als vollstaendige Live-Buchungsplattform. TravelLogik verspricht deshalb nur fuer klassische Hotels einen echten Selbstbuchungsfluss in der App.</p>
+    </div>
+    <div class="notice-card">
+      <strong>Was fuer Hosting vorbereitet ist</strong>
+      <p>Konfigurierbare Live-Datenquellen, Trennung zwischen Demo- und Live-Verhalten sowie eine konfigurierbare Pilot-Inbox machen den naechsten Schritt Richtung externem Pilotbetrieb einfacher.</p>
+    </div>
+    <div class="notice-card">
+      <strong>Was nach einer Anfrage passiert</strong>
+      <p>TravelLogik bestaetigt fuer klassische Hotels eine lokale Buchung in der App. Anfragen in Flug, Mietwagen, Transfer und Support-Faellen werden weiterhin als manueller Pilotfall aufgenommen und ueber den hinterlegten Kontaktweg beantwortet.</p>
+    </div>
+    <div class="notice-card">
+      <strong>Wie Daten im Pilot behandelt werden</strong>
+      <p>Auswahlen bleiben zunaechst lokal im Browser. Erst beim bewussten Weitergeben per Mail oder Copy wird daraus ein externer Pilotfall fuer das betreuende Team.</p>
+    </div>
+  </div>
+
+  <div class="kpi-grid" id="overview-kpis"></div>
+
+  <div class="split-grid" style="margin-top:1rem">
+    <div class="stack-col">
+      <div class="card">
+        <div class="section-head">
+          <div>
+            <div class="card-title">🚀 Produktstatus & naechste Stufe</div>
+            <p>Die aktuelle Stufe ist auf einen manuell betreuten Pilotbetrieb mit sauberem Anfrageeingang, klarer Rueckmeldung und bewusst ohne versprochene Vollautomatisierung ausgerichtet.</p>
+          </div>
+        </div>
+        <div class="roadmap-list" id="roadmap-list"></div>
+      </div>
+      <div class="card">
+        <div class="section-head">
+          <div>
+            <div class="card-title">🛡 Vertrauen & Betriebsgrundlagen</div>
+            <p>Vor dem Ausbau der Reichweite zaehlen klare Erwartungen, saubere Datenhinweise und geringe Reibung im Erstnutzerfluss.</p>
+          </div>
+        </div>
+        <div class="monetization-grid" id="monetization-grid"></div>
+      </div>
+    </div>
+
+    <div class="stack-col">
+      <div class="card">
+        <div class="card-title">⏳ Reise-Timeline & Vorgänge</div>
+        <div class="beta-inline-note" style="margin-bottom:1rem">Verfolgung aller Suchvorgaenge, Handoffs und Buchungen in chronologischer Reihenfolge.</div>
+        <div id="trip-timeline" class="timeline-container">
+          <div class="empty-state">Noch keine Vorgaenge erfasst.</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">💰 Tatsächliche Ausgaben</div>
+        <div class="beta-inline-note" style="margin-bottom:1rem">Zusammenfassung der Kosten basierend auf Ihren Buchungen und Handoffs.</div>
+        <div id="trip-expenses-summary">
+          <div class="empty-state">Noch keine Buchungen erfasst.</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-head">
+          <div>
+            <div class="card-title">🧠 Produktlogik</div>
+            <p>So trifft TravelLogik heute Entscheidungen fuer Preisvergleich, Empfehlungen und naechste Schritte.</p>
+          </div>
+        </div>
+        <div class="model-list" id="model-list"></div>
+      </div>
+      <div class="card">
+        <div class="section-head">
+          <div>
+            <div class="card-title">🧳 Aktive Reiseempfehlung</div>
+            <p>Direkt aus Ihren Praeferenzen und dem bisherigen Suchkontext abgeleitet.</p>
+          </div>
+        </div>
+        <div id="overview-recommendation"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════ FLÜGE ════════════════════════════════ -->
+<div class="page" id="page-flights">
+  <div class="hero">
+    <h2>✈️ Flüge suchen & vergleichen</h2>
+    <p>Starten Sie mit einer schnellen Flugrecherche und markieren Sie interessante Optionen fuer eine konkrete Pilot-Anfrage oder spaetere Weiterleitung.</p>
+    <div class="trip-type">
+      <button class="trip-btn active" onclick="setTripType(this,'one-way')">Einfach</button>
+      <button class="trip-btn" onclick="setTripType(this,'round-trip')">Hin & Zurück</button>
+      <button class="trip-btn" onclick="setTripType(this,'multi-city')">Multi-City</button>
+    </div>
+    <div class="form-row cols-2">
+      <div class="form-group">
+        <label style="color:rgba(255,255,255,.8)">Von</label>
+        <input type="text" id="f-from" list="flight-airports" placeholder="z.B. Frankfurt (FRA), Berlin (BER), Karlsruhe / Baden-Baden (FKB)">
+      </div>
+      <div class="form-group">
+        <label style="color:rgba(255,255,255,.8)">Nach</label>
+        <input type="text" id="f-to" list="flight-airports" placeholder="z.B. Barcelona (BCN), Palma de Mallorca (PMI), Tokio Haneda (HND)">
+      </div>
+    </div>
+    <div class="form-row cols-4">
+      <div class="form-group">
+        <label style="color:rgba(255,255,255,.8)">Hinflug</label>
+        <input type="date" id="f-dep" value="">
+      </div>
+      <div class="form-group" id="f-ret-group">
+        <label style="color:rgba(255,255,255,.8)">Rückflug</label>
+        <input type="date" id="f-ret">
+      </div>
+      <div class="form-group">
+        <label style="color:rgba(255,255,255,.8)">Passagiere</label>
+        <select id="f-pax">
+          <option value="1">1 Erwachsener</option>
+          <option value="2">2 Erwachsene</option>
+          <option value="3">3 Passagiere</option>
+          <option value="4">4 Passagiere</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label style="color:rgba(255,255,255,.8)">Klasse</label>
+        <select id="f-class">
+          <option>Economy</option>
+          <option>Business</option>
+          <option>First Class</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:flex;gap:.75rem;flex-wrap:wrap;align-items:center">
+      <button class="btn btn-hero" onclick="searchFlights()">🔍 Flüge suchen</button>
+      <button class="btn" style="background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.4)" onclick="openSuperFlights()">
+        ✈️ Super.com Flights ↗
+      </button>
+    </div>
+  </div>
+
+  <div class="suggest-banner" id="sug-flights"><span class="suggest-text" id="sug-flights-text"></span><div class="suggest-actions" id="sug-flights-actions"></div></div>
+  <div id="flight-results" style="display:none">
+    <div id="flight-recommendation"></div>
+    <div class="comparison-strip" id="flight-provider-strip"></div>
+    <div class="insight-grid" id="flight-insights"></div>
+    <div class="results-header">
+      <div class="results-count" id="f-count"></div>
+      <div class="sort-row" id="f-sort-row">
+        <span class="sort-label">Sortierung:</span>
+        <button class="sort-btn" data-key="price" data-dir="asc" onclick="multiSort('flights',this)"><span class="rank"></span>💰 Preis</button>
+        <button class="sort-btn" data-key="durationMin" data-dir="asc" onclick="multiSort('flights',this)"><span class="rank"></span>⏱ Dauer</button>
+        <button class="sort-btn" data-key="valueScore" data-dir="desc" onclick="multiSort('flights',this)"><span class="rank"></span>🏆 Value</button>
+        <button class="sort-btn" data-key="depTime" data-dir="asc" onclick="multiSort('flights',this)"><span class="rank"></span>🕐 Abflug</button>
+        <button class="sort-btn" data-key="stops" data-dir="asc" onclick="multiSort('flights',this)"><span class="rank"></span>✈ Stopps</button>
+        <button class="sort-clear" onclick="clearSort('flights')" title="Sortierung zurücksetzen">✕</button>
+      </div>
+    </div>
+    <div id="f-list"></div>
+  </div>
+  <div class="search-loader" id="f-loader"><div class="spinner"></div><br>Suche beste Flüge...</div>
+</div>
+
+<!-- ════════════════════════════════ HOTELS ════════════════════════════════ -->
+<div class="page" id="page-hotels">
+  <div class="hero">
+    <h2>🏨 Hotels suchen & buchungsbereit vorbereiten</h2>
+    <p>Klassische Hotels sind die erste Route in Richtung echter Buchbarkeit: Auswahl, Tarifkontext und naechster technischer Schritt bleiben in TravelLogik sichtbar. Sonderformen bleiben bewusst vorbereitet.</p>
+    <div class="form-row cols-3">
+      <div class="form-group" style="grid-column:span 1">
+        <label style="color:rgba(255,255,255,.8)">Zielort</label>
+        <input type="text" id="h-dest" placeholder="Stadt, Region oder Hotel" value="">
+      </div>
+      <div class="form-group">
+        <label style="color:rgba(255,255,255,.8)">Check-in</label>
+        <input type="date" id="h-in">
+      </div>
+      <div class="form-group">
+        <label style="color:rgba(255,255,255,.8)">Check-out</label>
+        <input type="date" id="h-out">
+      </div>
+    </div>
+    <div class="form-row cols-4">
+      <div class="form-group">
+        <label style="color:rgba(255,255,255,.8)">Gäste</label>
+        <select id="h-guests"><option value="1">1 Person</option><option value="2">2 Personen</option><option value="3">3 Personen</option><option value="4">4 Personen</option></select>
+      </div>
+      <div class="form-group">
+        <label style="color:rgba(255,255,255,.8)">Zimmer</label>
+        <select id="h-rooms"><option value="1">1 Zimmer</option><option value="2">2 Zimmer</option><option value="3">3 Zimmer</option></select>
+      </div>
+      <div class="form-group">
+        <label style="color:rgba(255,255,255,.8)">Sterne</label>
+        <select id="h-stars"><option value="0">Alle</option><option value="3">3★+</option><option value="4">4★+</option><option value="5">5★</option></select>
+      </div>
+      <div class="form-group">
+        <label style="color:rgba(255,255,255,.8)">Max. Preis/Nacht</label>
+        <select id="h-price"><option value="9999">Beliebig</option><option value="100">bis 100€</option><option value="200">bis 200€</option><option value="300">bis 300€</option></select>
+      </div>
+    </div>
+    <div class="form-row cols-1" style="margin-bottom:1rem">
+      <div class="form-group">
+        <label style="color:rgba(255,255,255,.8)">🏠 Unterkunftsart</label>
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap" id="accom-type-btns">
+          <button class="trip-btn active" data-type="lodging"      data-query="hotels"             onclick="setAccomType(this)">🏨 Hotels</button>
+          <button class="trip-btn"        data-type="vacation_rental" data-query="ferienwohnungen" onclick="setAccomType(this)">🏡 Ferienwohnungen</button>
+          <button class="trip-btn"        data-type="hostel"       data-query="hostels"            onclick="setAccomType(this)">🛏 Hostels</button>
+          <button class="trip-btn"        data-type="campground"   data-query="camping"            onclick="setAccomType(this)">⛺ Camping</button>
+          <button class="trip-btn"        data-type="lodging"      data-query="unterkunft"         onclick="setAccomType(this)">🔍 Alle</button>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;gap:.75rem;flex-wrap:wrap;align-items:center">
+      <button class="btn btn-hero" onclick="searchHotels()">🔍 Suchen</button>
+      <button class="btn" style="background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.4)" onclick="openAirbnb()">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="margin-right:.3rem"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 4.5c1.243 0 2.25 1.007 2.25 2.25S13.243 9 12 9 9.75 7.993 9.75 6.75 10.757 4.5 12 4.5zm5.25 13.5H6.75a.75.75 0 0 1-.648-1.127C7.352 14.83 9.53 13.5 12 13.5s4.648 1.33 5.898 3.373A.75.75 0 0 1 17.25 18z"/></svg>
+        Auf Airbnb suchen ↗
+      </button>
+      <button class="btn" style="background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.4)" onclick="openSuperHotels()">
+        🏨 Super.com ↗
+      </button>
+      <button class="btn" style="background:rgba(255,255,255,.12);color:#fff;border:1.5px solid rgba(255,255,255,.3)" onclick="openSettings()">
+        ⚙️ Google API
+      </button>
+    </div>
+    <div class="beta-inline-note" style="margin-top:.8rem;background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.28);color:rgba(255,255,255,.9)">
+      Mit aktivem Google-Places-Key werden echte Hotelobjekte geladen. Klassische Hotels werden in TravelLogik ehrlich zwischen Live-Suche, Vorpruefung und spaeterer Buchbarkeit getrennt; Ferienwohnungen, Hostels und Camping bleiben vorerst Recherche- und Weiterleitungsmodus.
+    </div>
+  </div>
+  <div class="suggest-banner" id="sug-hotels"><span class="suggest-text" id="sug-hotels-text"></span><div class="suggest-actions" id="sug-hotels-actions"></div></div>
+  <div id="hotel-results" style="display:none">
+    <div id="hotel-recommendation"></div>
+    <div class="comparison-strip" id="hotel-provider-strip"></div>
+    <div class="insight-grid" id="hotel-insights"></div>
+    <div id="h-source-status" style="display:none;margin-bottom:.8rem"></div>
+    <div id="hotel-handoff-status" style="display:none;margin-bottom:.8rem"></div>
+    <div class="results-header">
+      <div class="results-count" id="h-count"></div>
+      <div class="sort-row" id="h-sort-row">
+        <span class="sort-label">Sortierung:</span>
+        <button class="sort-btn" data-key="pricePerNight" data-dir="asc" onclick="multiSort('hotels',this)"><span class="rank"></span>💰 Preis</button>
+        <button class="sort-btn" data-key="airportMinutes" data-dir="asc" onclick="multiSort('hotels',this)"><span class="rank"></span>✈ Flughafen</button>
+        <button class="sort-btn" data-key="rating" data-dir="desc" onclick="multiSort('hotels',this)"><span class="rank"></span>⭐ Bewertung</button>
+        <button class="sort-btn" data-key="stars" data-dir="desc" onclick="multiSort('hotels',this)"><span class="rank"></span>🏅 Sterne</button>
+        <button class="sort-btn" data-key="valueScore" data-dir="desc" onclick="multiSort('hotels',this)"><span class="rank"></span>🏆 Value</button>
+        <button class="sort-clear" onclick="clearSort('hotels')" title="Sortierung zurücksetzen">✕</button>
+      </div>
+    </div>
+    <div id="h-list"></div>
+  </div>
+  <div class="search-loader" id="h-loader"><div class="spinner"></div><br>Suche Hotels...</div>
+</div>
+
+<!-- ════════════════════════════════ MIETWAGEN ════════════════════════════════ -->
+<div class="page" id="page-cars">
+  <div class="hero">
+    <h2>🚗 Mietwagen vergleichen & anfragen</h2>
+    <p>Vergleichen Sie Preise aller großen Anbieter</p>
+    <div class="form-row cols-3">
+      <div class="form-group">
+        <label style="color:rgba(255,255,255,.8)">Abholort</label>
+        <input type="text" id="c-pickup" placeholder="Flughafen oder Stadt" value="">
+      </div>
+      <div class="form-group">
+        <label style="color:rgba(255,255,255,.8)">Abgabeort</label>
+        <input type="text" id="c-dropoff" placeholder="Gleicher Ort">
+      </div>
+      <div class="form-group">
+        <label style="color:rgba(255,255,255,.8)">Fahrzeugklasse</label>
+        <select id="c-class"><option>Alle Klassen</option><option>Klein (Economy)</option><option>Mittelklasse</option><option>SUV</option><option>Luxus</option><option>Elektro</option></select>
+      </div>
+    </div>
+    <div class="form-row cols-4">
+      <div class="form-group">
+        <label style="color:rgba(255,255,255,.8)">Abholung Datum</label>
+        <input type="date" id="c-from">
+      </div>
+      <div class="form-group">
+        <label style="color:rgba(255,255,255,.8)">Abholung Zeit</label>
+        <input type="time" id="c-time" value="10:00">
+      </div>
+      <div class="form-group">
+        <label style="color:rgba(255,255,255,.8)">Rückgabe Datum</label>
+        <input type="date" id="c-to">
+      </div>
+      <div class="form-group">
+        <label style="color:rgba(255,255,255,.8)">Rückgabe Zeit</label>
+        <input type="time" id="c-ret-time" value="10:00">
+      </div>
+    </div>
+    <button class="btn btn-hero" onclick="searchCars()">🔍 Mietwagen suchen</button>
+  </div>
+  <div id="car-results" style="display:none">
+    <div id="car-recommendation"></div>
+    <div class="comparison-strip" id="car-provider-strip"></div>
+    <div class="insight-grid" id="car-insights"></div>
+    <div class="results-header">
+      <div class="results-count" id="c-count"></div>
+      <div class="sort-row" id="c-sort-row">
+        <span class="sort-label">Sortierung:</span>
+        <button class="sort-btn" data-key="price" data-dir="asc" onclick="multiSort('cars',this)"><span class="rank"></span>💰 Preis/Tag</button>
+        <button class="sort-btn" data-key="total" data-dir="asc" onclick="multiSort('cars',this)"><span class="rank"></span>💵 Gesamt</button>
+        <button class="sort-btn" data-key="class" data-dir="asc" onclick="multiSort('cars',this)"><span class="rank"></span>🚗 Klasse</button>
+        <button class="sort-btn" data-key="seats" data-dir="desc" onclick="multiSort('cars',this)"><span class="rank"></span>👤 Sitze</button>
+        <button class="sort-btn" data-key="valueScore" data-dir="desc" onclick="multiSort('cars',this)"><span class="rank"></span>🏆 Value</button>
+        <button class="sort-clear" onclick="clearSort('cars')" title="Sortierung zurücksetzen">✕</button>
+      </div>
+    </div>
+    <div id="c-list"></div>
+  </div>
+  <div class="search-loader" id="c-loader"><div class="spinner"></div><br>Suche Mietwagen...</div>
+</div>
+
+<!-- ════════════════════════════════ TRANSFER ════════════════════════════════ -->
+<div class="page" id="page-transfer">
+  <div class="hero">
+    <h2>🚌 Transport & Verbindungen</h2>
+    <p>Von der Haustuer zum Flughafen und vom Ankunftsort zum Hotel – Ihre Reisekette im Überblick.</p>
+    
+    <div style="display:flex;gap:.5rem;margin-top:1rem;justify-content:center">
+      <button class="trip-btn active" id="btn-tr-dest" onclick="switchTransferMode('destination')">🏨 Transfer am Zielort</button>
+      <button class="trip-btn" id="btn-tr-dep" onclick="switchTransferMode('departure')">🏠 Zubringer zum Flughafen</button>
+    </div>
+  </div>
+
+  <!-- Startpunkt / Home Address (Globale Einstellung fuer Transport) -->
+  <div class="card" style="margin-bottom:1rem;background:linear-gradient(135deg,#fdfcfb,#f5f7fa)">
+    <div style="display:flex;gap:1rem;align-items:center">
+      <div style="font-size:1.8rem">🏠</div>
+      <div style="flex:1">
+        <div style="font-weight:700;color:var(--primary)">Ihr Startpunkt</div>
+        <div style="font-size:.85rem;color:var(--text-light)">Geben Sie Ihre Adresse ein, um passende Verbindungen zum Flughafen zu finden.</div>
+        <input type="text" id="tr-home-address" placeholder="Ihre Adresse (Stadt, PLZ, Straße)" style="margin-top:.5rem;width:100%" onchange="saveHomeAddress()">
+      </div>
+    </div>
+  </div>
+
+  <!-- Context Banner -->
+  <div id="transfer-context" class="card" style="background:linear-gradient(135deg,#eaf3fc,#f0faf5);border:1.5px solid var(--accent);display:none">
+    <div style="display:flex;align-items:center;gap:.8rem;flex-wrap:wrap">
+      <div id="tr-context-icon" style="font-size:1.4rem">✈️→🏨</div>
+      <div>
+        <div style="font-weight:700;color:var(--primary)" id="tr-context-title">Transfer erkannt</div>
+        <div style="font-size:.85rem;color:var(--text-light)" id="tr-context-sub"></div>
+      </div>
+      <button class="btn btn-primary btn-sm" style="margin-left:auto" onclick="buildTransfers()">Optionen laden</button>
+    </div>
+  </div>
+
+  <!-- Manual input fallback -->
+  <div class="card" id="transfer-manual">
+    <div class="card-title" id="tr-search-title">🔍 Transfer am Zielort suchen</div>
+    <div class="form-row cols-3">
+      <div class="form-group">
+        <label id="tr-label-from">Flughafen / Abflugort</label>
+        <input type="text" id="tr-from" placeholder="z.B. Flughafen Barcelona">
+      </div>
+      <div class="form-group">
+        <label id="tr-label-to">Ziel (Hotel / Adresse)</label>
+        <input type="text" id="tr-to" placeholder="z.B. Hotel Arts Barcelona">
+      </div>
+      <div class="form-group">
+        <label>Personen</label>
+        <select id="tr-pax">
+          <option value="1">1 Person</option>
+          <option value="2" selected>2 Personen</option>
+          <option value="3">3 Personen</option>
+          <option value="4">4 Personen</option>
+          <option value="5">5+ Personen</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="buildTransfers()">🔍 Optionen anzeigen</button>
+  </div>
+
+  <!-- Transfer Results -->
+  <div id="transfer-results" style="display:none">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+      <div style="font-weight:600;color:var(--primary)" id="tr-route-label"></div>
+      <div style="font-size:.82rem;color:var(--muted)">Hinfahrt · Rückfahrt</div>
+    </div>
+
+    <!-- Options Grid -->
+    <div id="tr-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem"></div>
+
+    <!-- Return note -->
+    <div class="card" style="background:#fffde7;border-color:#f9ca24;margin-top:.5rem">
+      <div style="display:flex;align-items:center;gap:.7rem">
+        <span style="font-size:1.5rem">🔄</span>
+        <div>
+          <div style="font-weight:600;color:#856404">Rückfahrt nicht vergessen!</div>
+          <div style="font-size:.85rem;color:var(--text-light)" id="tr-return-note">Für die Rückfahrt zum Flughafen dieselben Optionen nutzen – ggf. Shuttle frueh anfragen oder reservieren (24h vorher).</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tips section -->
+    <div class="card" style="margin-top:.5rem">
+      <div class="card-title">💡 Insider-Tipps</div>
+      <div id="tr-tips" style="display:grid;grid-template-columns:1fr 1fr;gap:.7rem"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════ REISEPLANER ════════════════════════════════ -->
+<div class="page" id="page-planner">
+  <div class="card">
+    <div class="card-title">🗺️ Reiseplaner</div>
+    <div class="form-row cols-3">
+      <div class="form-group">
+        <label>Reiseziel</label>
+        <input type="text" id="p-dest" placeholder="z.B. Barcelona">
+      </div>
+      <div class="form-group">
+        <label>Von</label>
+        <input type="date" id="p-from">
+      </div>
+      <div class="form-group">
+        <label>Bis</label>
+        <input type="date" id="p-to">
+      </div>
+    </div>
+    <div class="form-row cols-2">
+      <div class="form-group">
+        <label>Reisestil</label>
+        <select id="p-style">
+          <option>Kultur & Geschichte</option>
+          <option>Strand & Entspannung</option>
+          <option>Abenteuer & Sport</option>
+          <option>Kulinarik & Lifestyle</option>
+          <option>Städtetrip & Shopping</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Tagesbudget (€)</label>
+        <input type="number" id="p-budget" placeholder="150" value="150">
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="generateItinerary()">✨ Reiseplan erstellen</button>
+  </div>
+
+  <div id="itinerary-container" style="display:none">
+    <div class="card" style="margin-bottom:1rem">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div class="card-title" id="p-title">Reiseplan</div>
+        <div style="display:flex;gap:.5rem">
+          <button class="btn btn-outline btn-sm" onclick="exportPlan()">📄 Export</button>
+          <button class="btn btn-primary btn-sm" onclick="addToBooking()">→ Als Anfrage vormerken</button>
+        </div>
+      </div>
+      <div class="map-placeholder">🗺️ Interaktive Karte · API-Integration verfügbar</div>
+      <div class="card-title" style="font-size:.85rem">Wettervorschau</div>
+      <div class="weather-widget" id="weather-widget"></div>
+    </div>
+    <div id="itinerary-days"></div>
+    <div class="card">
+      <div class="card-title">💡 Reisetipps</div>
+      <div id="travel-tips"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════ DESTINATION FINDER ════════════════════════════════ -->
+<div class="page" id="page-finder">
+  <div class="hero">
+    <h2>🌍 Destination Finder</h2>
+    <p>Waehlen Sie Ihre Vorlieben und erhalten Sie passende Reiseideen als Einstieg in die weitere Suche.</p>
+  </div>
+  <div class="card">
+    <div class="mood-section">
+      <div class="mood-title">🌡️ Klima</div>
+      <div class="mood-pills">
+        <span class="mood-pill" data-group="klima" data-val="strand">☀️ Strand & Sonne</span>
+        <span class="mood-pill" data-group="klima" data-val="berg">🏔️ Berge & Natur</span>
+        <span class="mood-pill" data-group="klima" data-val="mild">🌤️ Mild & Angenehm</span>
+        <span class="mood-pill" data-group="klima" data-val="tropisch">🌴 Tropisch & Exotisch</span>
+        <span class="mood-pill" data-group="klima" data-val="schnee">❄️ Schnee & Winter</span>
+      </div>
+    </div>
+    <div class="mood-section">
+      <div class="mood-title">🎯 Aktivität</div>
+      <div class="mood-pills">
+        <span class="mood-pill" data-group="activity" data-val="kultur">🏛️ Kultur & Geschichte</span>
+        <span class="mood-pill" data-group="activity" data-val="party">🎉 Nightlife & Party</span>
+        <span class="mood-pill" data-group="activity" data-val="natur">🥾 Natur & Wandern</span>
+        <span class="mood-pill" data-group="activity" data-val="food">🍽️ Kulinarik</span>
+        <span class="mood-pill" data-group="activity" data-val="sport">🤿 Wassersport</span>
+        <span class="mood-pill" data-group="activity" data-val="relax">🧘 Entspannung & Spa</span>
+      </div>
+    </div>
+    <div class="mood-section">
+      <div class="mood-title">⏱️ Reisedauer</div>
+      <div class="mood-pills">
+        <span class="mood-pill" data-group="dauer" data-val="kurz">2–4 Tage</span>
+        <span class="mood-pill" data-group="dauer" data-val="mittel">5–9 Tage</span>
+        <span class="mood-pill" data-group="dauer" data-val="lang">10–14 Tage</span>
+        <span class="mood-pill" data-group="dauer" data-val="xl">3+ Wochen</span>
+      </div>
+    </div>
+    <div class="mood-section">
+      <div class="mood-title">💰 Budget p.P.</div>
+      <div class="mood-pills">
+        <span class="mood-pill" data-group="budget" data-val="low">unter 500€</span>
+        <span class="mood-pill" data-group="budget" data-val="mid">500–1.500€</span>
+        <span class="mood-pill" data-group="budget" data-val="high">1.500–3.000€</span>
+        <span class="mood-pill" data-group="budget" data-val="lux">3.000€+</span>
+      </div>
+    </div>
+    <div class="mood-section">
+      <div class="mood-title">✈️ Flugdauer ab Ihrem Abflughafen</div>
+      <div class="mood-pills">
+        <span class="mood-pill" data-group="flug" data-val="kurz">bis 3h</span>
+        <span class="mood-pill" data-group="flug" data-val="mittel">3–6h</span>
+        <span class="mood-pill" data-group="flug" data-val="lang">6–12h</span>
+        <span class="mood-pill" data-group="flug" data-val="xl">12h+</span>
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="findDestinations()" style="margin-top:.5rem">✨ Reiseziele finden</button>
+  </div>
+  <div id="finder-results" style="display:none">
+    <div class="results-header">
+      <div class="results-count" id="finder-count"></div>
+    </div>
+    <div class="dest-grid" id="dest-grid"></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════ PACKLISTE ════════════════════════════════ -->
+<div class="page" id="page-packlist">
+  <div class="card">
+    <div class="card-title">🧳 Packlisten-Generator</div>
+    <div class="form-row cols-4">
+      <div class="form-group">
+        <label>Reiseziel</label>
+        <input type="text" id="pl-dest" placeholder="z.B. Thailand">
+      </div>
+      <div class="form-group">
+        <label>Klima</label>
+        <select id="pl-klima">
+          <option value="warm">☀️ Warm / Strand</option>
+          <option value="tropisch">🌴 Tropisch</option>
+          <option value="mild">🌤️ Mild / Gemäßigt</option>
+          <option value="kalt">❄️ Kalt / Winter</option>
+          <option value="berg">🏔️ Berge / Wandern</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Reisestil</label>
+        <select id="pl-style">
+          <option value="relax">🏖️ Strand & Relax</option>
+          <option value="kultur">🏛️ Städtetrip</option>
+          <option value="aktiv">🥾 Aktiv / Sport</option>
+          <option value="business">💼 Business</option>
+          <option value="family">👨‍👩‍👧 Familie</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Tage</label>
+        <input type="number" id="pl-days" value="7" min="1" max="30">
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="generatePacklist()">📋 Packliste erstellen</button>
+  </div>
+
+  <div id="packlist-container" style="display:none">
+    <div class="card" style="padding:1rem 1.5rem">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
+        <div class="card-title" style="margin:0" id="pl-title">Packliste</div>
+        <div style="display:flex;gap:.5rem">
+          <button class="btn btn-outline btn-sm" onclick="checkAll()">✓ Alle</button>
+          <button class="btn btn-outline btn-sm" onclick="uncheckAll()">☐ Keine</button>
+          <button class="btn btn-outline btn-sm" onclick="exportPacklist()">📄 Export</button>
+        </div>
+      </div>
+      <div class="pack-progress-bar"><div class="pack-progress-fill" id="pl-progress" style="width:0%"></div></div>
+      <div style="font-size:.82rem;color:var(--muted)" id="pl-stats">0 von 0 gepackt</div>
+    </div>
+    <div id="pl-categories"></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════ BUDGETPLANER ════════════════════════════════ -->
+<div class="page" id="page-budget">
+  <div class="card">
+    <div class="card-title">💰 Reisebudget-Planer</div>
+    <div class="form-row cols-3">
+      <div class="form-group">
+        <label>Reiseziel</label>
+        <input type="text" id="bud-dest" placeholder="z.B. Mallorca">
+      </div>
+      <div class="form-group">
+        <label>Reisende</label>
+        <input type="number" id="bud-pax" value="2" min="1" max="10">
+      </div>
+      <div class="form-group">
+        <label>Gesamtbudget (€)</label>
+        <input type="number" id="bud-total" placeholder="3000" value="3000" oninput="updateBudget()">
+      </div>
+    </div>
+    <div class="form-row cols-3">
+      <div class="form-group">
+        <label>Anreise</label>
+        <input type="date" id="bud-from">
+      </div>
+      <div class="form-group">
+        <label>Abreise</label>
+        <input type="date" id="bud-to">
+      </div>
+      <div class="form-group">
+        <label>Lebenshaltungskosten Ziel</label>
+        <select id="bud-level" onchange="updateBudget()">
+          <option value="1">💚 Günstig (Asien, Osteuropa)</option>
+          <option value="1.5" selected>🟡 Mittel (Südeuropa)</option>
+          <option value="2.2">🟠 Teuer (Westeuropa, USA)</option>
+          <option value="3.5">🔴 Sehr teuer (Skandinavien, Japan)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="budget-overview" id="bud-kpis">
+    <div class="budget-kpi"><div class="kpi-val" id="bud-kpi-total">3.000€</div><div class="kpi-label">Gesamtbudget</div></div>
+    <div class="budget-kpi"><div class="kpi-val" id="bud-kpi-used">0€</div><div class="kpi-label">Geplant</div></div>
+    <div class="budget-kpi ok" id="bud-kpi-rest-box"><div class="kpi-val" id="bud-kpi-rest">3.000€</div><div class="kpi-label">Verfügbar</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📊 Kostenaufstellung</div>
+    <div id="bud-rows"></div>
+    <div style="margin-top:1rem;padding-top:.8rem;border-top:2px solid var(--border);display:flex;justify-content:space-between;font-weight:700;font-size:1rem">
+      <span>Gesamt geplant</span><span id="bud-sum" style="color:var(--primary)">0€</span>
+    </div>
+  </div>
+
+  <div class="card" id="bud-tips-card" style="display:none">
+    <div class="card-title">💡 Spartipps für Ihr Ziel</div>
+    <div id="bud-tips"></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════ BUCHUNGEN ════════════════════════════════ -->
+<div class="page" id="page-bookings">
+  <div class="card">
+    <div class="card-title">📋 Buchungen & Anfragen</div>
+    <div class="beta-inline-note" style="margin-bottom:1rem">
+      Diese Ansicht ist jetzt die gemeinsame Liste fuer externe Hotelfaelle und ehrliche Anfragepfade. So bleibt sichtbar, was extern geoeffnet, gebucht oder bestaetigt wurde und was noch manuelles Follow-up braucht.
+    </div>
+    <div id="bookings-container">
+      <div class="empty-state"><div class="icon">📭</div><div>Noch keine Buchungen oder Anfragen</div><small>Hotels werden hier als externe Buchungsfaelle fuer Reise- und Kosten-Tracking gefuehrt.</small></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════ COMMUNITY ════════════════════════════════ -->
+<div class="page" id="page-community">
+  <div class="community-hero">
+    <h2 style="margin-bottom:.45rem">🌍 Community & Inhalte</h2>
+    <p style="font-size:.92rem;color:var(--text-light)">Preview fuer einen spaeteren Content- und Social-Layer: kuratierte Guides, Erfahrungen und sozialer Proof direkt neben der Reiseentscheidung.</p>
+  </div>
+  <div class="feed-grid">
+    <div class="stack-col">
+      <div class="card">
+        <div class="card-title">💬 Reise-Foren</div>
+        <div id="community-forums" class="community-list"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">🗺 Kuratierte Guides</div>
+        <div id="community-guides" class="community-list"></div>
+      </div>
+    </div>
+    <div class="stack-col">
+      <div class="card">
+        <div class="card-title">⭐ Neueste Nutzerbewertungen</div>
+        <div id="community-reviews" class="community-list"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">📈 Community-Mehrwert</div>
+        <div id="community-benefits" class="community-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<!-- ════════════════════════════════ BOOKING MODAL ════════════════════════════════ -->
+<div class="modal-overlay" id="booking-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span id="modal-title">Anfrage</span>
+      <button class="close-btn" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <!-- STEPPER -->
+      <div class="stepper" id="modal-stepper">
+        <div class="step"><div class="step-dot active" id="dot-1">1</div><div class="step-label">Auswahl</div></div>
+        <div class="step"><div class="step-dot" id="dot-2">2</div><div class="step-label">Reisende</div></div>
+        <div class="step"><div class="step-dot" id="dot-3">3</div><div class="step-label">Kontakt & Details</div></div>
+        <div class="step"><div class="step-dot" id="dot-4">4</div><div class="step-label">Bestaetigung</div></div>
+      </div>
+
+      <!-- STEP 1: SUMMARY -->
+      <div id="step-1">
+        <div id="booking-summary"></div>
+        <div class="price-summary">
+          <div class="price-row"><span id="ps-label1"></span><span id="ps-val1"></span></div>
+          <div class="price-row"><span>Steuern & Gebühren</span><span id="ps-tax"></span></div>
+          <div class="price-row total"><span>Gesamt</span><span id="ps-total"></span></div>
+        </div>
+      </div>
+
+      <!-- STEP 2: TRAVELER -->
+      <div id="step-2" style="display:none">
+        <div id="traveler-forms"></div>
+      </div>
+
+      <!-- STEP 3: REQUEST DETAILS -->
+      <div id="step-3" style="display:none">
+        <div class="form-group" style="margin-bottom:.75rem">
+          <label>Naechster Schritt</label>
+          <select id="request-type">
+            <option>🔎 Angebot pruefen</option>
+            <option>📞 Rueckruf anfordern</option>
+            <option>🧭 Beratung starten</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom:.75rem">
+          <label>Ansprechperson</label>
+          <input type="text" id="request-name" placeholder="Vor- und Nachname">
+        </div>
+        <div class="form-group" style="margin-bottom:.75rem">
+          <label>Telefon (optional)</label>
+          <input type="text" id="request-phone" placeholder="+49 ...">
+        </div>
+        <div class="form-group" style="margin-bottom:.75rem">
+          <label>Bevorzugter Kontaktweg</label>
+          <select id="request-channel">
+            <option>E-Mail</option>
+            <option>Telefon</option>
+            <option>E-Mail und Telefon</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom:.75rem">
+          <label>Zusatzhinweise</label>
+          <textarea id="request-notes" rows="4" placeholder="Zum Beispiel: spaete Anreise, ruhiges Zimmer, familienfreundliches Hotel, Transfer mit Kindersitz ..."></textarea>
+        </div>
+        <label style="display:flex;gap:.55rem;align-items:flex-start;font-size:.82rem;color:var(--text-light)">
+          <input type="checkbox" id="request-consent" style="width:auto;margin-top:.15rem">
+          <span>Ich moechte, dass TravelLogik diese Auswahl und meine Angaben fuer die Buchung oder den angefragten naechsten Schritt nutzt.</span>
+        </label>
+        <div class="alert alert-info" style="margin-top:.9rem">Dieser Schritt sammelt bewusst Kontakt- und Detaildaten. Hotels werden damit nur fuer Reiseverlauf und Kosten-Tracking erfasst; die Buchung selbst findet extern beim Anbieter statt.</div>
+      </div>
+
+      <!-- STEP 4: CONFIRMATION -->
+      <div id="step-4" style="display:none">
+        <div class="alert alert-success">
+          ✅ <strong id="confirm-banner-title">Auswahl gespeichert.</strong><br>
+          <span id="confirm-banner-text">Die Auswahl wurde lokal in diesem Browser gespeichert und fuer den naechsten Schritt vorbereitet.</span>
+        </div>
+        <div class="price-summary">
+          <div class="price-row"><span>Tracking-Referenz</span><span id="confirm-ref" style="font-weight:700;color:var(--accent)"></span></div>
+          <div class="price-row"><span>Status</span><span class="status-pill status-received" id="confirm-status">Eingegangen</span></div>
+          <div class="price-row"><span>Kontakt / Kanal</span><span id="confirm-email"></span></div>
+        </div>
+        <div id="confirm-details"></div>
+        <div class="beta-inline-note" id="confirm-next">Die Auswahl ist jetzt lokal gespeichert und der naechste Schritt ist vorbereitet.</div>
+        <div id="confirm-pilot-box"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" id="btn-back" onclick="modalBack()" style="display:none">← Zurück</button>
+      <button class="btn btn-primary" id="btn-next" onclick="modalNext()">Weiter →</button>
+      <button class="btn btn-success" id="btn-finish" onclick="closeModal()" style="display:none">✓ Fertig</button>
+    </div>
+  </div>
+</div>
+
+<script src="modules/travel-core.js"></script>
+<script src="modules/travel-hotel-mvp.js"></script>
+<script src="modules/travel-hotel-service.js"></script>
+<script src="modules/travel-flight-service.js"></script>
+<script src="modules/travel-car-service.js"></script>
+<script src="modules/travel-transfer-service.js"></script>
+<script src="modules/travel-comparison.js"></script>
+<script src="modules/travel-enrichment.js"></script>
+<script src="modules/travel-insights.js"></script>
+<script src="modules/travel-flights.js"></script>
+<script src="modules/travel-hotels.js"></script>
+<script src="modules/travel-hotel-readiness.js"></script>
+<script src="modules/travel-cars.js"></script>
+<script src="modules/travel-transfers.js"></script>
+<script src="modules/travel-results.js"></script>
+<script src="modules/travel-bookings.js"></script>
+<script src="modules/travel-booking-modal.js"></script>
+<script src="modules/travel-planner.js"></script>
+<script src="modules/travel-budget.js"></script>
+<script src="modules/travel-packlist.js"></script>
+<script src="modules/travel-settings.js"></script>
+<script src="modules/travel-finder.js"></script>
+<script src="modules/travel-community.js"></script>
+<script src="modules/travel-overview.js"></script>
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════════
+function readStoredJson(key, fallback){
+  try {
+    const raw = window.TravelLogikProduct?.storage?.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  } catch (error){
+    return fallback;
+  }
+}
+
+function createStorageAdapter(){
+  const fallbackStore = new Map();
+  try {
+    const testKey = '__tl_storage_test__';
+    window.localStorage.setItem(testKey, '1');
+    window.localStorage.removeItem(testKey);
+    return {
+      mode: 'local',
+      getItem: key => window.localStorage.getItem(key),
+      setItem: (key, value) => window.localStorage.setItem(key, value),
+      removeItem: key => window.localStorage.removeItem(key)
+    };
+  } catch (error){
+    return {
+      mode: 'memory',
+      getItem: key => fallbackStore.has(key) ? fallbackStore.get(key) : null,
+      setItem: (key, value) => fallbackStore.set(key, value),
+      removeItem: key => fallbackStore.delete(key)
+    };
+  }
+}
+
+window.TravelLogikProduct = window.TravelLogikProduct || {};
+window.TravelLogikProduct.config = Object.freeze({
+  stage: 'hostable-beta',
+  brandLabel: 'TravelLogik Beta',
+  storageKeyPrefix: 'tl_',
+  bookingMode: 'pilot-request',
+  hostedBaseUrl: window.location?.origin || '',
+  isHosted: /^https?:/i.test(window.location?.protocol || '')
+});
+window.TravelLogikProduct.storage = window.TravelLogikProduct.storage || createStorageAdapter();
+
+let bookings = readStoredJson('tl_bookings', []);
+let currentBookingItem = null;
+let modalStep = 1;
+let currentSort = {};
+let travelerProfile = readStoredJson('tl_profile', {style:'smart', budget:'mid', purpose:'leisure', priority:'value'});
+let flightData = [];
+let hotelData = [];
+let carData = [];
+let transferData = [];
+
+const {
+  clamp,
+  MODULE_META,
+  getModuleMeta,
+  getPreferredProviderQuote,
+  ensureOffer,
+  getSearchResults,
+  createProviderAdapter,
+  runSearchPipeline,
+  buildBookingRecord,
+  configureTravelCore
+} = window.TravelLogikCore;
+
+const {
+  getComparisonConfig,
+  getComparisonBaseValue,
+  getBestProviderLabel,
+  attachProviderComparison
+} = window.TravelLogikComparison;
+
+const {
+  configureTravelEnrichment,
+  decorateFlightResults,
+  decorateHotelResults,
+  decorateCarResults,
+  decorateTransferResults
+} = window.TravelLogikEnrichment;
+
+const {
+  renderProviderStrip,
+  renderComparisonSection,
+  renderInsights,
+  renderRecommendation
+} = window.TravelLogikInsights;
+
+const {
+  configureTravelFlights,
+  searchFlights
+} = window.TravelLogikFlights;
+
+const {
+  configureTravelHotels,
+  getAccommodationType,
+  setAccomType,
+  openAirbnb,
+  openSuperHotels,
+  searchHotels
+} = window.TravelLogikHotels;
+
+const {
+  configureTravelCars,
+  searchCars
+} = window.TravelLogikCars;
+
+const {
+  configureTravelTransfers,
+  handleTransferPageActivation,
+  buildTransfers,
+  requestUberEstimate
+} = window.TravelLogikTransfers;
+
+const {
+  configureTravelResults,
+  renderHotelHandoffStatus,
+  renderHotelSourceStatus,
+  renderFlights,
+  renderHotels,
+  renderCars
+} = window.TravelLogikResults;
+
+const {
+  configureTravelBookings,
+  renderBookings,
+  cancelBooking,
+  clearBookings
+} = window.TravelLogikBookings;
+
+const {
+  configureTravelBookingModal,
+  openBooking,
+  closeModal,
+  modalNext,
+  modalBack,
+  updateSteps,
+  formatCard,
+  formatExp,
+  registerBookingModalOverlay
+} = window.TravelLogikBookingModal;
+
+const {
+  configureTravelPlanner,
+  generateItinerary,
+  toggleDay,
+  addActivity,
+  exportPlan
+} = window.TravelLogikPlanner;
+
+const {
+  configureTravelBudget,
+  updateBudget,
+  recalcBudget
+} = window.TravelLogikBudget;
+
+const {
+  configureTravelPacklist,
+  generatePacklist,
+  togglePackCat,
+  delPackItem,
+  addPackItem,
+  updatePackProgress,
+  updateTotalPackProgress,
+  checkAll,
+  uncheckAll,
+  exportPacklist
+} = window.TravelLogikPacklist;
+
+const {
+  configureTravelSettings,
+  getGoogleConfig,
+  getUberConfig,
+  getPilotConfig,
+  initAmadeus,
+  searchHotelsGoogle,
+  openSettings,
+  closeSettings,
+  saveSettings,
+  testAmadeus,
+  updateUberSettingsHint,
+  testUberConnection,
+  fmtDate
+} = window.TravelLogikSettings;
+
+const {
+  configureTravelFinder,
+  findDestinations,
+  startBookingFromFinder,
+  showHotelsFromFinder
+} = window.TravelLogikFinder;
+
+const {
+  configureTravelOverview
+} = window.TravelLogikOverview;
+
+function readTravelerProfile(){
+  travelerProfile = readStoredJson('tl_profile', travelerProfile);
+  return travelerProfile;
+}
+
+function applyTravelerProfileToForm(){
+  const profile = readTravelerProfile();
+  const map = {
+    'pref-style': profile.style,
+    'pref-budget': profile.budget,
+    'pref-purpose': profile.purpose,
+    'pref-priority': profile.priority
+  };
+  Object.entries(map).forEach(([id, value])=>{
+    const el = document.getElementById(id);
+    if(el) el.value = value;
+  });
+}
+
+function saveTravelerProfile(){
+  travelerProfile = {
+    style: document.getElementById('pref-style')?.value || 'smart',
+    budget: document.getElementById('pref-budget')?.value || 'mid',
+    purpose: document.getElementById('pref-purpose')?.value || 'leisure',
+    priority: document.getElementById('pref-priority')?.value || 'value'
+  };
+  window.TravelLogikProduct.storage.setItem('tl_profile', JSON.stringify(travelerProfile));
+  renderOverview();
+  if(flightData.length) renderFlights(applyCurrentSort('flights'));
+  if(hotelData.length) renderHotels(applyCurrentSort('hotels'));
+  if(carData.length) renderCars(applyCurrentSort('cars'));
+}
+
+function applyCurrentSort(type){
+  const data = [...sortDataMap[type]()];
+  const order = sortOrders[type];
+  if(!order.length) return data;
+  return data.sort((a,b)=>{
+    for(const {key,dir} of order){
+      let av=a[key], bv=b[key];
+      if(typeof av==='string'){ av=av.toLowerCase(); bv=bv.toLowerCase(); }
+      if(av<bv) return dir==='asc' ? -1 : 1;
+      if(av>bv) return dir==='asc' ? 1 : -1;
+    }
+    return 0;
+  });
+}
+
+// Central trip context
+const trip = {
+  id: 'trip-' + Math.random().toString(36).slice(2,10),
+  from: '', to: '', destination: '',
+  depDate: '', retDate: '', pax: 1, days: 7,
+  items: [],
+  bookings: [],
+  done: { flights:false, hotels:false, cars:false, transfer:false, planner:false, packlist:false, budget:false }
+};
+
+configureTravelEnrichment({
+  getTravelerProfile: readTravelerProfile,
+  getTrip:()=>trip
+});
+
+configureTravelCore({
+  getTrip:()=>trip,
+  enrichers:{
+    flight: decorateFlightResults,
+    hotel: decorateHotelResults,
+    car: decorateCarResults,
+    transfer: decorateTransferResults
+  }
+});
+
+configureTravelResults({
+  getFlights:()=>flightData,
+  getHotels:()=>hotelData,
+  setHotels:(data)=>{ hotelData = data; },
+  getCars:()=>carData,
+  getAccommodationType,
+  getHotelSearchContext:()=>({
+    checkin: document.getElementById('h-in')?.value || '',
+    checkout: document.getElementById('h-out')?.value || '',
+    guests: parseInt(document.getElementById('h-guests')?.value) || 2,
+    rooms: parseInt(document.getElementById('h-rooms')?.value) || 1
+  }),
+  getHotelHandoffSummary,
+  getBestProviderLabel,
+  renderComparisonSection,
+  openBooking,
+  handoffHotelBooking:startHotelHandoff
+});
+
+configureTravelOverview({
+  getTravelerProfile: readTravelerProfile,
+  getBookings: ()=>bookings,
+  getFlightData: ()=>flightData,
+  getHotelData: ()=>hotelData,
+  getCarData: ()=>carData
+});
+
+configureTravelFlights({
+  createProviderAdapter,
+  runSearchPipeline,
+  setTrip,
+  renderFlights,
+  buildSuggests,
+  getFlightData:()=>flightData,
+  setFlightData:(data)=>{ flightData = data; }
+});
+
+configureTravelHotels({
+  createProviderAdapter,
+  runSearchPipeline,
+  setTrip,
+  renderHotels,
+  renderHotelSourceStatus,
+  getHotelData:()=>hotelData,
+  setHotelData:(data)=>{ hotelData = data; },
+  getGoogleConfig,
+  searchHotelsGoogle
+});
+
+configureTravelCars({
+  createProviderAdapter,
+  runSearchPipeline,
+  renderCars,
+  getCarData:()=>carData,
+  setCarData:(data)=>{ carData = data; }
+});
+
+configureTravelTransfers({
+  createProviderAdapter,
+  runSearchPipeline,
+  getSearchResults,
+  getTrip:()=>trip,
+  setTransferData:(data)=>{ transferData = data; },
+  getUberConfig,
+  markDone,
+  fmtDate
+});
+
+function getBookingsState(){
+  return bookings;
+}
+
+function setBookingsState(nextBookings){
+  bookings = nextBookings;
+}
+
+function persistBookingsState(nextBookings){
+  try {
+    if(nextBookings.length){
+      window.TravelLogikProduct.storage.setItem('tl_bookings', JSON.stringify(nextBookings));
+    } else {
+      window.TravelLogikProduct.storage.removeItem('tl_bookings');
+    }
+  } catch (error){
+    console.warn('Buchungen konnten nicht persistent gespeichert werden.', error);
+  }
+}
+
+function createHotelHandoffId(){
+  return 'TLH' + Math.random().toString(36).substring(2, 8).toUpperCase();
+}
+
+function getHotelSearchContextState(){
+  return {
+    checkin: document.getElementById('h-in')?.value || '',
+    checkout: document.getElementById('h-out')?.value || '',
+    guests: parseInt(document.getElementById('h-guests')?.value) || 2,
+    rooms: parseInt(document.getElementById('h-rooms')?.value) || 1
+  };
+}
+
+function getHotelHandoffSummary(){
+  const hotelBookings = bookings
+    .filter(booking=>booking.type === 'hotel' && booking.status !== 'cancelled')
+    .sort((a, b)=>new Date(b.confirmedAt || b.lastRedirectedAt || b.lastUpdatedAt || b.createdAt || 0) - new Date(a.confirmedAt || a.lastRedirectedAt || a.lastUpdatedAt || a.createdAt || 0));
+  if(!hotelBookings.length) return null;
+  const latest = hotelBookings[0];
+  const latestDate = new Date(latest.confirmedAt || latest.lastRedirectedAt || latest.lastUpdatedAt || latest.createdAt || Date.now());
+  return {
+    count: hotelBookings.length,
+    proposedCount: hotelBookings.filter(booking=>['proposed','demo','live-search','precheck-required','ready-to-book','prepared'].includes(booking.status)).length,
+    openedCount: hotelBookings.filter(booking=>booking.status === 'external-opened' || booking.status === 'redirected').length,
+    bookedCount: hotelBookings.filter(booking=>booking.status === 'external-booked' || booking.status === 'external-completed' || booking.status === 'booked').length,
+    confirmedCount: hotelBookings.filter(booking=>booking.status === 'external-confirmed' || booking.status === 'confirmed').length,
+    latestName: latest.name,
+    latestAtLabel: Number.isNaN(latestDate.getTime())
+      ? ''
+      : latestDate.toLocaleString('de-DE', {
+          day:'2-digit',
+          month:'2-digit',
+          hour:'2-digit',
+          minute:'2-digit'
+        })
+  };
+}
+
+function startHotelHandoff(item, handoffUrl){
+  const offer = ensureOffer('hotel', item);
+  const redirectUrl = String(handoffUrl || '').trim();
+  if(!/^https?:\/\//i.test(redirectUrl)){
+    alert('Die externe Hotel-Weiterleitung ist gerade nicht verfuegbar.');
+    return;
+  }
+
+  const context = getHotelSearchContextState();
+  const now = new Date().toISOString();
+  const handoffKey = [
+    offer.offerId || offer.name || '',
+    offer.dest || '',
+    context.checkin || '',
+    context.checkout || '',
+    context.guests || 1
+  ].join('::');
+  const detailParts = [
+    `${offer.stars || 3}★`,
+    offer.nights ? `${offer.nights} Naechte` : '',
+    offer.dest || '',
+    context.checkin && context.checkout ? `${context.checkin} bis ${context.checkout}` : ''
+  ].filter(Boolean);
+
+  const nextBookings = bookings.slice();
+  const existing = nextBookings.find(booking=>booking.workflow === 'external-hotel-handoff' && booking.handoffKey === handoffKey && booking.status !== 'cancelled');
+  const handoffSummaryLines = booking=>[
+    `TravelLogik externer Hotelfall ${booking.id}`,
+    '',
+    'STATUS',
+    booking.status === 'external-confirmed' || booking.status === 'confirmed'
+      ? 'Extern bestaetigt'
+      : booking.status === 'external-booked' || booking.status === 'external-completed' || booking.status === 'booked'
+        ? 'Extern gebucht'
+        : booking.status === 'external-opened' || booking.status === 'redirected'
+          ? 'Extern geoeffnet'
+          : 'Vorgeschlagen',
+    '',
+    `Hotel: ${booking.name}`,
+    `Details: ${booking.detail}`,
+    `Anbieter: ${booking.handoffProvider || 'Booking.com'}`,
+    `Externe URL: ${booking.handoffUrl}`,
+    booking.lastRedirectedAt ? `Zuletzt extern geoeffnet: ${new Date(booking.lastRedirectedAt || booking.lastUpdatedAt || booking.createdAt || now).toLocaleString('de-DE')}` : '',
+    booking.handoffCount ? `Externe Oeffnungen: ${booking.handoffCount}` : '',
+    booking.lastExternalCompletionAt ? `Extern gebucht am: ${new Date(booking.lastExternalCompletionAt).toLocaleString('de-DE')}` : '',
+    booking.confirmedAt ? `Extern bestaetigt am: ${new Date(booking.confirmedAt).toLocaleString('de-DE')}` : '',
+    '',
+    'HINWEIS',
+    'TravelLogik hat diesen externen Hotelfall nur fuer Reiseverlauf und Kosten-Tracking erfasst. Abschluss und Bestaetigung finden ausschliesslich extern statt.'
+  ].join('\n');
+
+  if(existing){
+    if(existing.status !== 'external-confirmed' && existing.status !== 'external-booked'){
+      existing.status = 'external-opened';
+    }
+    existing.detail = detailParts.join(' · ') || existing.detail;
+    existing.sourceOffer = offer;
+    existing.handoffProvider = /booking\.com/i.test(redirectUrl) ? 'Booking.com' : (existing.handoffProvider || 'Externer Anbieter');
+    existing.lastUpdatedAt = now;
+    existing.lastRedirectedAt = now;
+    existing.handoffCount = (existing.handoffCount || 1) + 1;
+    existing.handoffUrl = redirectUrl;
+    existing.requestSummary = handoffSummaryLines(existing);
+    existing.statusHistory = Array.isArray(existing.statusHistory) ? existing.statusHistory : [];
+    existing.statusHistory.push({
+      from: 'redirected',
+      to: 'redirected',
+      at: now
+    });
+  } else {
+    const record = buildBookingRecord(createHotelHandoffId(), {type:'hotel', offer, total:offer.total || 0}, '');
+    const handoffRecord = {
+      ...record,
+      status: 'external-opened',
+      workflow: 'external-hotel-handoff',
+      detail: detailParts.join(' · ') || record.detail,
+      sourceOffer: offer,
+      handoffProvider: /booking\.com/i.test(redirectUrl) ? 'Booking.com' : 'Externer Anbieter',
+      handoffLabel: 'Extern geoeffnet',
+      handoffUrl: redirectUrl,
+      handoffKey,
+      handoffCount: 1,
+      lastRedirectedAt: now,
+      lastUpdatedAt: now,
+      statusHistory: [{
+        from: 'draft',
+        to: 'external-opened',
+        at: now
+      }]
+    };
+    handoffRecord.requestSummary = handoffSummaryLines(handoffRecord);
+    nextBookings.unshift(handoffRecord);
+  }
+
+  bookings = nextBookings;
+  persistBookingsState(bookings);
+  syncTripCoreFromBookings();
+  renderOverview();
+  if(document.getElementById('page-bookings')?.classList.contains('active')) renderBookings();
+  if(hotelData.length) renderHotels(applyCurrentSort('hotels'));
+  window.open(redirectUrl, '_blank', 'noopener');
+}
+
+function syncProductStatusBanner(){
+  const hostingBadge = document.getElementById('hosting-badge');
+  const storageBadge = document.getElementById('storage-badge');
+  const dataBadge = document.getElementById('data-mode-badge');
+  const pilotBadge = document.getElementById('pilot-mode-badge');
+  const publicPilotNote = document.getElementById('public-pilot-note');
+  const hostingStatusValue = document.getElementById('hosting-status-value');
+  const pilotContactValue = document.getElementById('pilot-contact-value');
+  const pilotReadinessValue = document.getElementById('pilot-readiness-value');
+  const config = window.TravelLogikProduct?.config || {};
+  const storageMode = window.TravelLogikProduct?.storage?.mode || 'memory';
+  const pilotConfig = getPilotConfig?.() || {};
+  const pilotReady = !!pilotConfig.contactEmail;
+  const hostedReady = !!config.isHosted;
+  const responseWindow = `${pilotConfig.responseTimeHours || 24}h`;
+  const contactChannel = pilotConfig.contactChannel || 'E-Mail';
+  const operatorName = pilotConfig.operatorName || pilotConfig.contactLabel || 'TravelLogik Pilotdesk';
+  if(hostingBadge){
+    hostingBadge.textContent = hostedReady ? 'Unter externer URL erreichbar' : 'Noch nicht auf externer URL';
+    hostingBadge.className = `product-badge ${hostedReady ? 'live' : 'demo'}`;
+  }
+  if(storageBadge){
+    storageBadge.textContent = storageMode === 'local' ? 'Speicherung im Browser' : 'Temporäre Sitzungsspeicherung';
+    storageBadge.className = `product-badge ${storageMode === 'local' ? 'local' : 'demo'}`;
+  }
+  if(dataBadge){
+    const googleReady = !!getGoogleConfig()?.apiKey;
+    const uberReady = !!(getUberConfig()?.enabled && getUberConfig()?.backendUrl && getUberConfig()?.clientId);
+    dataBadge.textContent = googleReady || uberReady ? 'Hotels live, andere Routen vorbereitet' : 'Aktuell Demo- und Vorbereitungsmodus';
+    dataBadge.className = `product-badge ${googleReady || uberReady ? 'live' : 'demo'}`;
+  }
+  if(pilotBadge){
+    pilotBadge.textContent = pilotReady ? 'Pilot-Uebergabe & Rueckmeldung bereit' : 'Pilot-Uebergabe noch nicht konfiguriert';
+    pilotBadge.className = `product-badge ${pilotReady ? 'live' : 'demo'}`;
+  }
+  if(publicPilotNote){
+    publicPilotNote.textContent = hostedReady && pilotReady
+      ? `TravelLogik kann jetzt ueber eine externe URL als betreuter Pilot getestet werden. Klassische Hotels werden in der App ehrlich zwischen vorbereiteter Strecke, Vorpruefung und bestaetigter Buchung getrennt; Rueckmeldungen fuer Anfragepfade erfolgen manuell innerhalb von ${responseWindow} via ${contactChannel}.`
+      : hostedReady
+        ? 'Die App ist bereits ueber eine externe URL erreichbar. Fuer belastbare externe Tests fehlen jetzt vor allem noch Pilot-Inbox und Rueckmeldefenster fuer alle nicht buchbaren Anfragepfade.'
+        : 'Fuer externe Tests sollte TravelLogik ueber eine stabile URL, mit konfigurierter Pilot-Inbox und klarem Rueckmeldefenster bereitgestellt werden.';
+  }
+  if(hostingStatusValue){
+    hostingStatusValue.textContent = hostedReady ? (config.hostedBaseUrl || 'Externe URL aktiv') : 'Lokale Testumgebung';
+  }
+  if(pilotContactValue){
+    pilotContactValue.textContent = pilotReady
+      ? `${pilotConfig.contactEmail} · ${operatorName} · ${contactChannel}`
+      : 'Noch nicht vollstaendig konfiguriert';
+  }
+  if(pilotReadinessValue){
+    const readyText = hostedReady && pilotReady
+      ? `Extern testbar mit manueller Rueckmeldung in ${responseWindow}`
+      : pilotReady
+        ? `Pilot-Inbox bereit, aber noch keine externe URL`
+        : 'Noch nicht bereit';
+    pilotReadinessValue.textContent = readyText;
+  }
+}
+
+function getBookingById(id){
+  return bookings.find(booking=>booking.id === id) || null;
+}
+
+function buildPilotRequestMailto(booking){
+  if(!booking) return '';
+  const target = booking.pilotEmail || getPilotConfig()?.contactEmail || '';
+  const subject = encodeURIComponent(booking.requestSubject || `TravelLogik Pilotanfrage ${booking.id}`);
+  const body = encodeURIComponent(booking.requestSummary || '');
+  return target ? `mailto:${target}?subject=${subject}&body=${body}` : '';
+}
+
+function openPilotRequest(id){
+  const booking = getBookingById(id);
+  if(!booking) return;
+  const mailto = buildPilotRequestMailto(booking);
+  if(mailto){
+    window.location.href = mailto;
+    return;
+  }
+  alert(booking.requestSummary || 'Kein Anfrage-Text vorhanden.');
+}
+
+function buildBookingCalendarIcs(booking){
+  if(!booking) return '';
+  const start = booking.checkIn || booking.tripItem?.tripContext?.startDate;
+  const end = booking.checkOut || booking.tripItem?.tripContext?.endDate;
+  if(!start || !end) return '';
+  const toIcsDate = (value)=>{
+    const date = new Date(value);
+    if(Number.isNaN(date.getTime())) return '';
+    return [
+      date.getUTCFullYear(),
+      String(date.getUTCMonth() + 1).padStart(2, '0'),
+      String(date.getUTCDate()).padStart(2, '0')
+    ].join('');
+  };
+  const startDate = toIcsDate(start);
+  const endDate = toIcsDate(end);
+  if(!startDate || !endDate) return '';
+  const stamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
+  const lines = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//TravelLogik//Hotel Booking//DE',
+    'BEGIN:VEVENT',
+    `UID:${booking.id}@travellogik.local`,
+    `DTSTAMP:${stamp}`,
+    `DTSTART;VALUE=DATE:${startDate}`,
+    `DTEND;VALUE=DATE:${endDate}`,
+    `SUMMARY:${booking.name || 'Hotelbuchung'}`,
+    `DESCRIPTION:${(booking.requestSummary || '').replace(/\n/g, '\\n')}`,
+    `LOCATION:${booking.tripItem?.tripContext?.destination || booking.detail || ''}`,
+    'END:VEVENT',
+    'END:VCALENDAR'
+  ];
+  return lines.join('\r\n');
+}
+
+function downloadBookingCalendar(id){
+  const booking = getBookingById(id);
+  if(!booking){
+    alert('Buchung nicht gefunden.');
+    return;
+  }
+  const ics = buildBookingCalendarIcs(booking);
+  if(!ics){
+    alert('Fuer diese Buchung sind noch keine Kalenderdaten hinterlegt.');
+    return;
+  }
+  const blob = new Blob([ics], {type:'text/calendar;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = `${booking.bookingNumber || booking.precheckRef || booking.id || 'travellogik-booking'}.ics`;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  URL.revokeObjectURL(url);
+}
+
+function openExternalHotelHandoff(id){
+  const booking = getBookingById(id);
+  if(!booking?.handoffUrl){
+    alert('Keine externe Hotel-Weiterleitung gespeichert.');
+    return;
+  }
+  if(booking.sourceOffer){
+    startHotelHandoff(booking.sourceOffer, booking.handoffUrl);
+    return;
+  }
+  window.open(booking.handoffUrl, '_blank', 'noopener');
+}
+
+function startHotelRequestFromHandoff(id){
+  const booking = getBookingById(id);
+  const sourceOffer = booking?.sourceOffer || null;
+  if(!sourceOffer){
+    alert('Fuer diesen Hotel-Handoff ist kein Rueckfrage-Fallback verfuegbar.');
+    return;
+  }
+  showPage('page-hotels');
+  openBooking('hotel', sourceOffer);
+}
+
+async function copyPilotRequest(id){
+  const booking = getBookingById(id);
+  if(!booking?.requestSummary) return;
+  try {
+    await navigator.clipboard.writeText(booking.requestSummary);
+  } catch (error){
+    const fallback = document.createElement('textarea');
+    fallback.value = booking.requestSummary;
+    document.body.appendChild(fallback);
+    fallback.select();
+    document.execCommand('copy');
+    fallback.remove();
+  }
+  alert(booking.type === 'hotel'
+    ? 'Hotel-Tracking-Details wurden in die Zwischenablage kopiert.'
+    : 'Anfrage-Text wurde in die Zwischenablage kopiert.');
+}
+
+function getCurrentBookingState(){
+  return currentBookingItem;
+}
+
+function setCurrentBookingState(nextBookingItem){
+  currentBookingItem = nextBookingItem;
+}
+
+function getBookingModalStep(){
+  return modalStep;
+}
+
+function setBookingModalStep(nextModalStep){
+  modalStep = nextModalStep;
+}
+
+configureTravelBookings({
+  getBookings:getBookingsState,
+  setBookings:setBookingsState,
+  syncTripCoreFromBookings,
+  persistBookings:persistBookingsState,
+  refreshRelatedViews:()=>{
+    renderOverview();
+    if(hotelData.length) renderHotels(applyCurrentSort('hotels'));
+  },
+  getModuleMeta,
+  getPilotConfig,
+  openBooking
+});
+
+configureTravelBookingModal({
+  ensureOffer,
+  getTrip:()=>trip,
+  getBookings:getBookingsState,
+  setBookings:setBookingsState,
+  getCurrentBookingItem:getCurrentBookingState,
+  setCurrentBookingItem:setCurrentBookingState,
+  getModalStep:getBookingModalStep,
+  setModalStep:setBookingModalStep,
+  buildBookingRecord,
+  syncTripCoreFromBookings,
+  persistBookings:persistBookingsState,
+  refreshRelatedViews:()=>{
+    renderOverview();
+    if(hotelData.length) renderHotels(applyCurrentSort('hotels'));
+    if(document.getElementById('page-bookings')?.classList.contains('active')) renderBookings();
+  },
+  getPilotConfig,
+  getModuleMeta,
+  markDone
+});
+
+configureTravelPlanner({
+  setTrip,
+  markDone
+});
+
+configureTravelBudget();
+
+configureTravelPacklist({
+  setTrip,
+  markDone
+});
+
+configureTravelSettings({
+  getAccommodationType
+});
+
+configureTravelFinder({
+  setTrip,
+  showPage,
+  searchFlights,
+  searchHotels,
+  getTrip:()=>trip
+});
+
+function syncTripCoreFromBookings(){
+  const activeBookings = bookings.filter(b=>b.status !== 'cancelled');
+  trip.bookings = activeBookings.map(b=>b.id);
+  trip.items = activeBookings.map(b=>b.tripItem).filter(Boolean);
+  ['flights','hotels','cars','transfer'].forEach(key=>{
+    trip.done[key] = activeBookings.some(booking=>MODULE_META[booking.type]?.doneKey === key);
+  });
+  renderTripBar();
+}
+
+function setTrip(data){
+  Object.assign(trip, data);
+  if(trip.depDate && trip.retDate){
+    trip.days = Math.max(1, Math.round((new Date(trip.retDate)-new Date(trip.depDate))/86400000));
+  } else if(trip.depDate){
+    trip.days = 1;
+  }
+  if(!Array.isArray(trip.items)) trip.items = [];
+  if(!Array.isArray(trip.bookings)) trip.bookings = [];
+  renderTripBar();
+}
+
+function renderTripBar(){
+  if(!trip.to && !trip.destination){ document.getElementById('trip-bar').style.display='none'; return; }
+  document.getElementById('trip-bar').style.display='block';
+  const dest = trip.destination || trip.to;
+  document.getElementById('tb-route').textContent = `${trip.from||'–'} → ${dest}`;
+  if(trip.depDate){
+    const fmtD = d => new Date(d).toLocaleDateString('de-DE',{day:'numeric',month:'short'});
+    document.getElementById('tb-dates').textContent =
+      trip.retDate ? `${fmtD(trip.depDate)} – ${fmtD(trip.retDate)} (${trip.days} T.)` : fmtD(trip.depDate);
+  } else { document.getElementById('tb-dates').textContent = '–'; }
+  document.getElementById('tb-pax').textContent = `${trip.pax} Person${trip.pax>1?'en':''}`;
+  // module badges
+  const map = {flights:'tm-flights',hotels:'tm-hotels',cars:'tm-cars',transfer:'tm-transfer',planner:'tm-planner',packlist:'tm-packlist',budget:'tm-budget'};
+  Object.entries(map).forEach(([k,id])=>{
+    const el=document.getElementById(id);
+    el.classList.toggle('done', !!trip.done[k]);
+  });
+}
+
+function markDone(module){ trip.done[module]=true; renderTripBar(); }
+
+function clearTrip(){
+  if(!confirm('Reisedaten zurücksetzen?')) return;
+  Object.assign(trip,{from:'',to:'',destination:'',depDate:'',retDate:'',pax:1,days:7,items:[],bookings:[]});
+  trip.done={flights:false,hotels:false,cars:false,transfer:false,planner:false,packlist:false,budget:false};
+  flightData = [];
+  hotelData = [];
+  carData = [];
+  transferData = [];
+  [
+    ['flight-results', 'none'],
+    ['hotel-results', 'none'],
+    ['car-results', 'none'],
+    ['transfer-results', 'none'],
+    ['itinerary-container', 'none'],
+    ['packlist-container', 'none'],
+    ['finder-results', 'none']
+  ].forEach(([id, display])=>{
+    const el = document.getElementById(id);
+    if(el) el.style.display = display;
+  });
+  [
+    'f-list','h-list','c-list','tr-cards','itinerary-days','pl-categories','dest-grid'
+  ].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.innerHTML = '';
+  });
+  ['f-count','h-count','c-count','finder-count'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.textContent = '';
+  });
+  const budgetTips = document.getElementById('bud-tips');
+  const budgetTipsCard = document.getElementById('bud-tips-card');
+  if(budgetTips) budgetTips.innerHTML = '';
+  if(budgetTipsCard) budgetTipsCard.style.display = 'none';
+  renderTripBar();
+  hideSuggest();
+}
+
+// ── SUGGEST BANNERS ──
+function showSuggest(page, text, actions){
+  const b=document.getElementById('sug-'+page);
+  const t=document.getElementById('sug-'+page+'-text');
+  const a=document.getElementById('sug-'+page+'-actions');
+  if(!b||!t||!a) return;
+  t.textContent=text;
+  a.innerHTML=actions.map(ac=>`<button class="btn btn-primary btn-sm" onclick="${ac.fn}">${ac.label}</button>`).join('');
+  b.classList.add('show');
+}
+function hideSuggest(){ document.querySelectorAll('.suggest-banner').forEach(b=>b.classList.remove('show')); }
+
+// ── PROPAGATE trip → form fields ──
+function propagateTripToForms(page){
+  const dest=trip.destination||trip.to;
+  if(!dest) return;
+  if(page==='page-hotels'){
+    if(dest) document.getElementById('h-dest').value=dest;
+    if(trip.depDate) document.getElementById('h-in').value=trip.depDate;
+    if(trip.retDate) document.getElementById('h-out').value=trip.retDate;
+    if(trip.pax){
+      document.getElementById('h-guests').value = Math.min(trip.pax, 4);
+    }
+  }
+  if(page==='page-cars'){
+    if(dest) document.getElementById('c-pickup').value=dest;
+    if(trip.depDate) document.getElementById('c-from').value=trip.depDate;
+    if(trip.retDate) document.getElementById('c-to').value=trip.retDate;
+  }
+  if(page==='page-planner'){
+    if(dest) document.getElementById('p-dest').value=dest;
+    if(trip.depDate) document.getElementById('p-from').value=trip.depDate;
+    if(trip.retDate) document.getElementById('p-to').value=trip.retDate;
+  }
+  if(page==='page-packlist'){
+    if(dest) document.getElementById('pl-dest').value=dest;
+    if(trip.days) document.getElementById('pl-days').value=trip.days;
+  }
+  if(page==='page-budget'){
+    if(dest) document.getElementById('bud-dest').value=dest;
+    if(trip.depDate) document.getElementById('bud-from').value=trip.depDate;
+    if(trip.retDate) document.getElementById('bud-to').value=trip.retDate;
+    if(trip.pax) document.getElementById('bud-pax').value=trip.pax;
+    updateBudget();
+  }
+}
+
+// ── SUGGEST logic per page ──
+function buildSuggests(page){
+  if(!trip.to && !trip.destination) return;
+  const dest=trip.destination||trip.to;
+  const missing=Object.entries(trip.done).filter(([k,v])=>!v).map(([k])=>k);
+  if(page==='page-flights' && trip.done.flights){
+    const next=missing.find(m=>m!=='flights');
+    if(next){
+      const labels={hotels:'Hotel',cars:'Mietwagen',planner:'Reiseplaner',packlist:'Packliste',budget:'Budget'};
+      showSuggest('flights',
+        `✅ Flug nach ${dest} gebucht! Nächster Schritt: ${labels[next]} ergänzen.`,
+        [{label:`→ ${labels[next]} jetzt`,fn:`showPage('page-${next}')`}]);
+    }
+  }
+  if(page==='page-hotels'){
+    if(!trip.done.hotels && trip.done.flights){
+      showSuggest('hotels',
+        `✈️ Reisedaten aus Flugsuche übernommen: ${dest} · ${trip.days} Nächte`,
+        [{label:'Jetzt suchen',fn:'searchHotels()'}]);
+    }
+  }
+}
+
+// Set default dates
+(function(){
+  const today = new Date();
+  const fmt = d => d.toISOString().split('T')[0];
+  const add = (d,n) => { const r=new Date(d); r.setDate(r.getDate()+n); return r; };
+  document.getElementById('f-dep').value = fmt(add(today,7));
+  document.getElementById('f-ret').value = fmt(add(today,14));
+  document.getElementById('h-in').value = fmt(add(today,7));
+  document.getElementById('h-out').value = fmt(add(today,10));
+  document.getElementById('c-from').value = fmt(add(today,7));
+  document.getElementById('c-to').value = fmt(add(today,10));
+  document.getElementById('p-from').value = fmt(add(today,30));
+  document.getElementById('p-to').value = fmt(add(today,37));
+})();
+
+// ═══════════════════════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════════════════════
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelector(`[data-page="${id}"]`)?.classList.add('active');
+  // Mark active module in trip bar
+  const modMap={'page-flights':'tm-flights','page-hotels':'tm-hotels','page-cars':'tm-cars',
+    'page-transfer':'tm-transfer','page-planner':'tm-planner','page-packlist':'tm-packlist','page-budget':'tm-budget'};
+  document.querySelectorAll('.trip-mod').forEach(m=>m.classList.remove('active-mod'));
+  if(modMap[id]) document.getElementById(modMap[id])?.classList.add('active-mod');
+  // Propagate + suggest
+  hideSuggest();
+  propagateTripToForms(id);
+  if(id==='page-transfer') handleTransferPageActivation();
+  buildSuggests(id);
+  if(id==='page-bookings') renderBookings();
+  if(id==='page-hotels') renderHotelHandoffStatus();
+  if(id==='page-overview') renderOverview();
+  if(id==='page-community') renderCommunityHub();
+}
+function setTripType(btn, type){
+  document.querySelectorAll('#page-flights .trip-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('f-ret-group').style.opacity = type==='one-way'?'0.4':'1';
+  document.getElementById('f-ret').disabled = type==='one-way';
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  FLIGHT DATA & SEARCH
+// ═══════════════════════════════════════════════════════════════
+// ─── MULTI-SORT SYSTEM ───
+const sortOrders = {flights:[], hotels:[], cars:[]};
+const sortDataMap = {flights:()=>flightData, hotels:()=>hotelData, cars:()=>carData};
+const sortRenderMap = {flights:renderFlights, hotels:renderHotels, cars:renderCars};
+
+function multiSort(type, btn){
+  const key = btn.dataset.key;
+  const order = sortOrders[type];
+  const existing = order.findIndex(s=>s.key===key);
+  if(existing>=0){
+    // Toggle direction or remove
+    if(order[existing].dir==='asc') order[existing].dir='desc';
+    else order.splice(existing,1);
+  } else {
+    order.push({key, dir: btn.dataset.dir||'asc'});
+    if(order.length>3) order.shift(); // max 3 levels
+  }
+  updateSortButtons(type);
+  applySort(type);
+}
+function clearSort(type){
+  sortOrders[type]=[];
+  updateSortButtons(type);
+  sortRenderMap[type](sortDataMap[type]());
+}
+function updateSortButtons(type){
+  const pageMap={flights:'#page-flights',hotels:'#page-hotels',cars:'#page-cars'};
+  const order = sortOrders[type];
+  document.querySelectorAll(pageMap[type]+' .sort-btn').forEach(btn=>{
+    const key=btn.dataset.key;
+    const idx=order.findIndex(s=>s.key===key);
+    btn.className='sort-btn';
+    const rankEl=btn.querySelector('.rank');
+    if(idx>=0){
+      btn.classList.add(`rank-${idx+1}`);
+      btn.classList.add(order[idx].dir==='asc'?'sort-asc':'sort-desc');
+      if(rankEl) rankEl.textContent=idx+1;
+    } else {
+      if(rankEl) rankEl.textContent='';
+    }
+  });
+  // Show sort description
+  const desc = order.map((s,i)=>`${i+1}. ${s.key} (${s.dir==='asc'?'↑':'↓'})`).join('  ');
+  const label = document.querySelector(pageMap[type]+' .sort-label');
+  if(label) label.textContent = order.length ? 'Sortiert:' : 'Sortierung:';
+}
+function applySort(type){
+  sortRenderMap[type](applyCurrentSort(type));
+}
+function sortFlights(){} // kept for legacy, replaced above
+
+// ═══════════════════════════════════════════════════════════════
+//  HOTEL DATA & SEARCH
+// ═══════════════════════════════════════════════════════════════
+function sortHotels(){} // replaced by multiSort
+
+// ═══════════════════════════════════════════════════════════════
+//  CAR DATA & SEARCH
+// ═══════════════════════════════════════════════════════════════
+function sortCars(){} // replaced by multiSort
+
+function addToBooking(){
+  const dest = document.getElementById('p-dest')?.value?.trim() || trip.destination || trip.to;
+  if(dest){
+    setTrip({destination: dest, to: dest});
+    const flightDest = document.getElementById('f-to');
+    if(flightDest) flightDest.value = dest;
+  }
+  showPage('page-flights');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  BUCHUNGSÜBERSICHT
+// ═══════════════════════════════════════════════════════════════
+// Close modal on overlay click
+registerBookingModalOverlay();
+
+document.addEventListener('DOMContentLoaded',()=>{
+  initAmadeus();
+  syncProductStatusBanner();
+});
+
+applyTravelerProfileToForm();
+syncTripCoreFromBookings();
+renderOverview();
+renderCommunityHub();
+renderTripBar();
+initAmadeus();
+syncProductStatusBanner();
+</script>
+
+<!-- SETTINGS MODAL -->
+<div class="modal-overlay" id="settings-modal">
+  <div class="modal" style="max-width:680px">
+    <div class="modal-header">
+      <span>⚙️ Datenquellen & Hosting-Vorbereitung</span>
+      <button class="close-btn" onclick="closeSettings()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="alert alert-info" style="margin-bottom:1.2rem">
+        <strong>Google Places</strong> aktiviert echte Hoteldaten. <strong>Uber via eigenem Backend</strong> bereitet spaetere Transferpreise, ETA und Ride Requests fuer einen sicheren Live-Betrieb vor.
+      </div>
+      <div class="beta-inline-note" style="margin-bottom:1rem">
+        Diese Einstellungen sind so gedacht, dass TravelLogik lokal und spaeter auf einer Domain laufen kann. Nicht konfigurierte Dienste fallen kontrolliert auf gekennzeichnete Demo- oder Vorbereitungszustaende zurueck.
+      </div>
+
+      <div style="background:var(--bg);border-radius:8px;padding:1rem;margin-bottom:1rem;font-size:.87rem;line-height:1.7">
+        <strong>Google Places Einrichtung:</strong><br>
+        1. <a href="https://console.cloud.google.com" target="_blank" style="color:var(--accent)">console.cloud.google.com</a> öffnen → Anmelden<br>
+        2. Neues Projekt erstellen (z.B. <em>TravelLogik</em>)<br>
+        3. Linkes Menü → <strong>APIs &amp; Dienste → Bibliothek</strong><br>
+        4. Suche: <strong>„Places API"</strong> → Aktivieren<br>
+        5. Linkes Menü → <strong>Anmeldedaten → + Anmeldedaten erstellen → API-Schlüssel</strong><br>
+        6. Kopierten Key unten einfügen
+      </div>
+
+      <div class="form-group" style="margin-bottom:1rem">
+        <label>Google Places API-Key</label>
+        <input type="text" id="s-api-key" placeholder="AIzaSy...">
+      </div>
+      <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap">
+        <button class="btn btn-outline btn-sm" onclick="testAmadeus()">🔌 Testen</button>
+        <span id="s-test-result" style="font-size:.85rem"></span>
+      </div>
+      <div class="alert" style="background:#fef9e7;border:1px solid #f9e79f;color:#7d6608;margin-top:1rem;font-size:.82rem">
+        💡 Tipp: API-Key in Google Console auf Ihre Domain einschränken für mehr Sicherheit
+      </div>
+
+      <div style="height:1px;background:var(--border);margin:1.3rem 0"></div>
+
+      <div style="background:var(--bg);border-radius:8px;padding:1rem;margin-bottom:1rem;font-size:.87rem;line-height:1.7">
+        <strong>Uber API Architektur:</strong><br>
+        1. Uber App im Uber Developer Dashboard anlegen<br>
+        2. <strong>Client ID</strong> und Redirect URI erzeugen<br>
+        3. Eigenes Backend bereitstellen, z.B. <code>/uber/quote</code> und <code>/uber/health</code><br>
+        4. Frontend sendet Start/Ziel/Personen an Ihr Backend<br>
+        5. Backend uebernimmt OAuth, Uber Pricing und spaeter Ride Requests
+      </div>
+
+      <div class="form-group" style="margin-bottom:.8rem">
+        <label style="display:flex;align-items:center;gap:.5rem;font-size:.82rem">
+          <input type="checkbox" id="s-uber-enabled" onchange="updateUberSettingsHint()" style="width:auto">
+          Uber API aktivieren
+        </label>
+      </div>
+      <div class="form-row cols-2">
+        <div class="form-group">
+          <label>Uber Client ID</label>
+          <input type="text" id="s-uber-client-id" placeholder="z.B. abc123..." oninput="updateUberSettingsHint()">
+        </div>
+        <div class="form-group">
+          <label>Redirect URI</label>
+          <input type="text" id="s-uber-redirect" placeholder="https://ihredomain.de/api/uber/callback" oninput="updateUberSettingsHint()">
+        </div>
+      </div>
+      <div class="form-group" style="margin-top:.8rem">
+        <label>Uber Backend URL</label>
+        <input type="text" id="s-uber-backend" placeholder="https://ihredomain.de/api/uber" oninput="updateUberSettingsHint()">
+      </div>
+      <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;margin-top:.8rem">
+        <button class="btn btn-outline btn-sm" onclick="testUberConnection()">🔌 Backend testen</button>
+        <span id="s-uber-result" style="font-size:.85rem"></span>
+      </div>
+      <div class="alert" style="background:#eef6fb;border:1px solid #d6e8f5;color:#1a5276;margin-top:1rem;font-size:.82rem">
+        Die Uber-API wird hier bewusst nicht direkt aus dem Browser aufgerufen. Das Frontend ist auf einen sicheren Backend-Proxy vorbereitet.
+      </div>
+
+      <div style="height:1px;background:var(--border);margin:1.3rem 0"></div>
+
+      <div style="background:var(--bg);border-radius:8px;padding:1rem;margin-bottom:1rem;font-size:.87rem;line-height:1.7">
+        <strong>Pilot-Inbox fuer echte Anfragen:</strong><br>
+        Hinterlegen Sie die minimale Ops-Grundlage fuer echten Pilotbetrieb: Zieladresse, Bearbeitername, Rueckmeldefenster und bevorzugten Kontaktkanal. TravelLogik bereitet daraus keinen automatisierten Checkout, sondern einen klaren manuellen Pilotfall vor.
+      </div>
+      <div class="form-row cols-2">
+        <div class="form-group">
+          <label>Pilot-E-Mail</label>
+          <input type="email" id="s-pilot-email" placeholder="pilot@ihredomain.de">
+        </div>
+        <div class="form-group">
+          <label>Anzeigename</label>
+          <input type="text" id="s-pilot-label" placeholder="TravelLogik Pilotdesk">
+        </div>
+      </div>
+      <div class="form-row cols-2" style="margin-top:.8rem">
+        <div class="form-group">
+          <label>Bearbeitername / Team</label>
+          <input type="text" id="s-pilot-operator" placeholder="z.B. Anna aus dem Pilotdesk">
+        </div>
+        <div class="form-group">
+          <label>Rueckmeldung innerhalb von (Stunden)</label>
+          <input type="number" id="s-pilot-response" min="1" step="1" placeholder="24">
+        </div>
+      </div>
+      <div class="form-group" style="margin-top:.8rem">
+        <label>Standard-Kontaktweg</label>
+        <select id="s-pilot-channel">
+          <option>E-Mail</option>
+          <option>Telefon</option>
+          <option>E-Mail und Telefon</option>
+        </select>
+      </div>
+      <div class="beta-inline-note" style="margin-top:.9rem">
+        Ohne diese Angaben bleibt der Flow nutzbar, endet aber noch als interner Anfrage-Text. Mit Pilot-Inbox plus Rueckmeldeversprechen entsteht ein erster belastbarer externer Testprozess ohne Backend-Umbau.
+      </div>
+      <div class="price-summary" id="hosting-status-box" style="margin-top:1rem">
+        <div class="price-row"><span>Aktuelle Bereitstellung</span><span id="hosting-status-value">Lokale Testumgebung</span></div>
+        <div class="price-row"><span>Pilotkontakt</span><span id="pilot-contact-value">Noch nicht vollstaendig konfiguriert</span></div>
+        <div class="price-row total"><span>Externer Teststatus</span><span id="pilot-readiness-value">Noch nicht bereit</span></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeSettings()">Abbrechen</button>
+      <button class="btn btn-success" onclick="saveSettings()">✓ Speichern & Aktivieren</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

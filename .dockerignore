@@ -1,0 +1,11 @@
+node_modules
+.git
+.env
+.env.*
+!.env.example
+*.log
+.codex-edge-profile
+.codex-edge-visible
+npm-debug.log*
+Dockerfile
+docker-compose*.yml
