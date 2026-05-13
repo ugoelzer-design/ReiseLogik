@@ -8,14 +8,14 @@
       pros:['Tür zu Tür','24/7 verfügbar','Gepäck kein Problem'],
       best:'Komfort + Flexibilität',
       links:[
-        {label:'FreeNow oeffnen', url:()=>`https://www.free-now.com/`},
+        {label:'FreeNow öffnen', url:()=>`https://www.free-now.com/`},
         {label:'Taxi.eu', url:()=>`https://www.taxi.eu/`},
       ],
       color:'#f39c12'
     },
     {
       id:'uber', icon:'⚫', name:'Uber / Bolt', price:'€-€€',
-      desc:'API-ready fuer Live-Preis, ETA und spaetere Ride-Requests ueber Ihr eigenes Backend.',
+      desc:'API-ready für Live-Preis, ETA und spätere Ride-Requests über Ihr eigenes Backend.',
       pros:['Preis via API abfragbar','ETA und Produktwahl moeglich','passt zu echtem Preisvergleich'],
       best:'Stadtgebiete + eigene Buchungslogik',
       links:[
@@ -72,7 +72,7 @@
 
   const TRANSFER_TIPS = {
     default:[
-      {icon:'⏰', title:'Frueh planen', text:'Shuttle-Services 24–48h vorher anfragen oder reservieren, besonders in der Hauptsaison.'},
+      {icon:'⏰', title:'Früh planen', text:'Shuttle-Services 24–48h vorher anfragen oder reservieren, besonders in der Hauptsaison.'},
       {icon:'💵', title:'Wechselgeld bereitlegen', text:'Taxis im Ausland oft nur Bar – kleines Trinkgeld (10%) wird erwartet.'},
       {icon:'📱', title:'Offline-Karte laden', text:'Google Maps Bereich offline herunterladen – spart Datenvolumen & Nerven.'},
       {icon:'🏷️', title:'Namensschild-Service', text:'Bei Privat-Fahrern: Buchungsnummer bereithalten, Fahrer wartet am Terminal.'},
@@ -291,7 +291,7 @@
       return;
     }
     if(state.kind === 'loading'){
-      el.innerHTML = `<div class="alert alert-info" style="margin:.75rem 0 0">⏳ Uber-Angebote werden ueber Ihr Backend geladen...</div>`;
+      el.innerHTML = `<div class="alert alert-info" style="margin:.75rem 0 0">⏳ Uber-Angebote werden über Ihr Backend geladen...</div>`;
       return;
     }
     if(state.kind === 'error'){
@@ -300,7 +300,7 @@
     }
     const products = state.products || [];
     if(!products.length){
-      el.innerHTML = `<div class="alert alert-info" style="margin:.75rem 0 0">Keine Uber-Produkte fuer diese Route erhalten.</div>`;
+      el.innerHTML = `<div class="alert alert-info" style="margin:.75rem 0 0">Keine Uber-Produkte für diese Route erhalten.</div>`;
       return;
     }
     el.innerHTML = `
@@ -318,7 +318,7 @@
               </div>
             </div>
             <div style="display:flex;gap:.45rem;flex-wrap:wrap;margin-top:.6rem">
-              ${p.deepLink ? `<a href="${p.deepLink}" target="_blank" class="btn btn-primary btn-sm" style="text-decoration:none">Uber oeffnen</a>` : ''}
+              ${p.deepLink ? `<a href="${p.deepLink}" target="_blank" class="btn btn-primary btn-sm" style="text-decoration:none">Uber öffnen</a>` : ''}
               ${p.requestToken ? `<button class="btn btn-success btn-sm" onclick="alert('Ride Request Token: ${p.requestToken}')">Ride Request</button>` : ''}
             </div>
           </div>`).join('')}

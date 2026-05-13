@@ -246,13 +246,13 @@
     const clientId = document.getElementById('s-uber-client-id')?.value.trim() || '';
     const backendUrl = document.getElementById('s-uber-backend')?.value.trim() || '';
     if(!enabled){
-      hint.textContent = 'Uber API ist deaktiviert. Fuer MVP kann Google allein aktiv bleiben.';
+      hint.textContent = 'Uber API ist deaktiviert. Für MVP kann Google allein aktiv bleiben.';
       hint.style.color = 'var(--muted)';
     } else if(clientId && backendUrl){
       hint.textContent = 'Uber API ist konfigurierbar. Das Frontend sendet Transferdaten an Ihr Backend.';
       hint.style.color = 'var(--success)';
     } else {
-      hint.textContent = 'Fuer Uber API bitte mindestens Client ID und Backend-Endpunkt eintragen.';
+      hint.textContent = 'Für Uber API bitte mindestens Client ID und Backend-Endpunkt eintragen.';
       hint.style.color = 'var(--warn)';
     }
   }
@@ -268,7 +268,7 @@
       return;
     }
 
-    result.textContent = '⏳ Pruefe Uber-Backend...';
+    result.textContent = '⏳ Prüfe Uber-Backend...';
     result.style.color = 'var(--muted)';
     try {
       const response = await fetch(backendUrl.replace(/\/$/, '') + '/health');
@@ -276,11 +276,11 @@
         result.textContent = '✅ Backend erreichbar. Uber API-Flow kann angebunden werden.';
         result.style.color = 'var(--success)';
       } else {
-        result.textContent = `⚠️ Backend antwortet mit HTTP ${response.status}. Endpunkt pruefen.`;
+        result.textContent = `⚠️ Backend antwortet mit HTTP ${response.status}. Endpunkt prüfen.`;
         result.style.color = 'var(--warn)';
       }
     } catch (error){
-      result.textContent = '❌ Backend nicht erreichbar. URL, CORS oder lokalen Server pruefen.';
+      result.textContent = '❌ Backend nicht erreichbar. URL, CORS oder lokalen Server prüfen.';
       result.style.color = 'var(--danger)';
     }
   }

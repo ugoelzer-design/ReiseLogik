@@ -62,7 +62,7 @@
   }
 
   function getHotelExternalBookingLabel(url){
-    return /booking\.com/i.test(url || '') ? 'Booking.com pruefen' : 'Extern pruefen';
+    return /booking\.com/i.test(url || '') ? 'Booking.com prüfen' : 'Extern prüfen';
   }
 
   function buildGoogleSearchUrl(query){
@@ -85,7 +85,7 @@
       'Google Hotels',
       hotel?.name || hotel?.dest || hotel?.address || '',
       context.checkin && context.checkout ? `${context.checkin} bis ${context.checkout}` : '',
-      context.guests ? `${context.guests} Gaeste` : ''
+      context.guests ? `${context.guests} Gäste` : ''
     ].filter(Boolean).join(' ');
     return buildGoogleSearchUrl(query);
   }
@@ -212,12 +212,12 @@
             <div class="hotel-detail-note">Check-in ab ${escapeHtml(hotel.checkInFrom || '15:00')} · Check-out bis ${escapeHtml(hotel.checkOutUntil || '11:00')} · ${escapeHtml(hotel.frontDesk || 'Rezeption vor Ort')}</div>
           </div>
           <div class="hotel-detail-card">
-            <div class="hotel-detail-label">Passend fuer</div>
+            <div class="hotel-detail-label">Passend für</div>
             <div class="hotel-detail-value">${escapeHtml(hotel.idealFor || 'Externe Hotelbuchung mit lokalem Tracking')}</div>
             <div class="hotel-detail-note">${escapeHtml(hotel.transportNote || '')}</div>
           </div>
           <div class="hotel-detail-card hotel-detail-card-wide">
-            <div class="hotel-detail-label">Gewaehlter Tarif im Kontext</div>
+            <div class="hotel-detail-label">Gewählter Tarif im Kontext</div>
             <div class="hotel-detail-value">${escapeHtml(selectedOption.rateName)}</div>
             <div class="hotel-detail-note">${escapeHtml(selectedOption.bedding)} · ${escapeHtml(selectedOption.roomSize)} · ${escapeHtml(selectedOption.view)} · ${escapeHtml(selectedOption.occupancyLabel)}</div>
           </div>
@@ -269,7 +269,7 @@
           <span>${status.detail || ''}</span>
         </div>
         <div style="margin-top:.45rem;font-size:.78rem;line-height:1.5">
-          <strong>Produktstatus:</strong> Klassische Hotels sind die erste Route in Richtung echter Buchbarkeit. TravelLogik trennt jetzt sauber zwischen Demo, Live-Suche, Vorpruefung und spaeter buchbarer Provider-Strecke.
+          <strong>Produktstatus:</strong> Klassische Hotels sind die erste Route in Richtung echter Buchbarkeit. TravelLogik trennt jetzt sauber zwischen Demo, Live-Suche, Vorpruefung und später buchbarer Provider-Strecke.
         </div>
       </div>`;
   }
@@ -287,12 +287,12 @@
 
     const detail = summary.latestName
       ? `Letzter Tracking-Fall: ${escapeHtml(summary.latestName)}${summary.latestAtLabel ? ` · ${escapeHtml(summary.latestAtLabel)}` : ''}`
-      : 'Hotel extern fuer Tracking erfasst';
+      : 'Hotel extern für Tracking erfasst';
     const progressBits = [];
     if(summary.proposedCount) progressBits.push(`${summary.proposedCount} vorgeschlagen`);
-    if(summary.openedCount) progressBits.push(`${summary.openedCount} extern geoeffnet`);
+    if(summary.openedCount) progressBits.push(`${summary.openedCount} extern geöffnet`);
     if(summary.bookedCount) progressBits.push(`${summary.bookedCount} extern gebucht`);
-    if(summary.confirmedCount) progressBits.push(`${summary.confirmedCount} extern bestaetigt`);
+    if(summary.confirmedCount) progressBits.push(`${summary.confirmedCount} extern bestätigt`);
     const progressLine = progressBits.length
       ? `<div style="margin-top:.45rem;font-size:.78rem;line-height:1.5"><strong>Lokaler Funnel:</strong> ${progressBits.join(' · ')}</div>`
       : '';
@@ -305,7 +305,7 @@
           <span>${detail}</span>
         </div>
         <div style="margin-top:.45rem;font-size:.78rem;line-height:1.5">
-          Hotels werden in TravelLogik nur fuer Reiseverlauf und Kosten-Tracking gefuehrt. Die eigentliche Buchung findet immer beim externen Anbieter statt.
+          Hotels werden in TravelLogik nur für Reiseverlauf und Kosten-Tracking geführt. Die eigentliche Buchung findet immer beim externen Anbieter statt.
         </div>
         ${progressLine}
       </div>`;
@@ -349,7 +349,7 @@
           <div class="amount">€${f.price}</div>
           <div class="per">pro Person</div>
           <div style="font-size:.76rem;color:var(--success);margin-top:.2rem">${f.savings ? `bis zu €${f.savings} günstiger via ${runtime.getBestProviderLabel(f)}` : 'Direktpreis ist Bestpreis'}</div>
-          <button class="btn btn-primary btn-sm" style="margin-top:.5rem" onclick="event.stopPropagation();window.open('${googleFlightsUrl}','_blank','noopener')">Bei Google pruefen</button>
+          <button class="btn btn-primary btn-sm" style="margin-top:.5rem" onclick="event.stopPropagation();window.open('${googleFlightsUrl}','_blank','noopener')">Bei Google prüfen</button>
           <button class="btn btn-outline btn-sm" style="margin-top:.35rem" onclick="event.stopPropagation();openBooking('flight',${serializeInlineItem(f)})">Anfrage merken</button>
         </div>
       </div>
@@ -423,11 +423,11 @@
         ? `
               <button class="btn btn-success btn-sm" onclick="event.stopPropagation();window.open('${googleHotelsUrl}','_blank','noopener')">Google Hotels</button>
               <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();startHotelHandoff(${serializeInlineItem(offer)},${JSON.stringify(externalBookingUrl)})">${primaryActionLabel}</button>
-              <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();openBooking('hotel',${serializeInlineItem(offer)})">Fuer Tracking erfassen</button>
+              <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();openBooking('hotel',${serializeInlineItem(offer)})">Für Tracking erfassen</button>
               <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();toggleHotelDetails('${escapeHtml(String(h.offerId || h.id))}')">${expandedHotelId === String(h.offerId || h.id) ? 'Details ausblenden' : 'Mehr Details'}</button>`
         : `
-              <button class="btn btn-sm" style="background:${extraColor};color:#fff" onclick="event.stopPropagation();window.open('${extraUrl}','_blank','noopener')">Extern pruefen</button>
-              <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();openBooking('hotel',${serializeInlineItem(offer)})">Rueckfrage senden</button>`;
+              <button class="btn btn-sm" style="background:${extraColor};color:#fff" onclick="event.stopPropagation();window.open('${extraUrl}','_blank','noopener')">Extern prüfen</button>
+              <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();openBooking('hotel',${serializeInlineItem(offer)})">Rückfrage senden</button>`;
       const roomOptionsHtml = selectedOption
         ? `<div class="hotel-rate-list">
             ${getHotelRoomOptions(h).map(option=>{
@@ -445,7 +445,7 @@
             }).join('')}
           </div>
           <div class="hotel-rate-summary">
-            <strong>Aktuell gewaehlt:</strong> ${escapeHtml(selectedOption.rateName)} · ${escapeHtml(selectedOption.note)}
+            <strong>Aktuell gewählt:</strong> ${escapeHtml(selectedOption.rateName)} · ${escapeHtml(selectedOption.note)}
             ${checkin && checkout ? `<span> · ${escapeHtml(formatDate(checkin))} bis ${escapeHtml(formatDate(checkout))}</span>` : ''}
             <span> · ${escapeHtml(selectedOption.bedding)} · ${escapeHtml(selectedOption.roomSize)}</span>
           </div>`
@@ -511,7 +511,7 @@
           <div style="font-size:1.3rem;font-weight:700;color:var(--primary)">€${c.price}<span style="font-size:.75rem;color:var(--muted)">/Tag</span></div>
           <div style="font-size:.8rem;color:var(--muted)">€${c.total} (${c.days} T.)</div>
           <div style="font-size:.76rem;color:var(--success);margin-top:.2rem">${c.savings ? `bis zu €${c.savings} sparen` : 'Direktpreis ist Bestpreis'}</div>
-          <button class="btn btn-primary btn-sm" style="margin-top:.5rem" onclick="event.stopPropagation();window.open('${googleCarsUrl}','_blank','noopener')">Bei Google pruefen</button>
+          <button class="btn btn-primary btn-sm" style="margin-top:.5rem" onclick="event.stopPropagation();window.open('${googleCarsUrl}','_blank','noopener')">Bei Google prüfen</button>
           <button class="btn btn-outline btn-sm" style="margin-top:.35rem" onclick="event.stopPropagation();openBooking('car',${serializeInlineItem(c)})">Anfrage merken</button>
         </div>
       </div>

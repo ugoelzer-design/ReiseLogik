@@ -25,7 +25,7 @@
       ? `${state.missingStep}: ${state.missingDetail}`
       : 'Externe Reservierung mit Referenz liegt vor.';
 
-    if(level === 'ready-to-book') badgeLabel = 'Bereit fuer Buchung';
+    if(level === 'ready-to-book') badgeLabel = 'Bereit für Buchung';
     if(level === 'booked') badgeLabel = 'Gebucht';
     if(level === 'failed') badgeLabel = 'Fehlgeschlagen';
 
@@ -43,7 +43,7 @@
       searchReal: sourceMode !== 'demo',
       summary,
       missing,
-      actionLabel: 'Fuer Tracking erfassen',
+      actionLabel: 'Für Tracking erfassen',
       statusLabel: state.statusLabel,
       technicalStage: state.technicalStage,
       missingStep: state.missingStep,
@@ -67,15 +67,15 @@
     if(readiness.level === 'booked'){
       return {
         badgeTone: 'bookable',
-        headline: `Extern bestaetigt via ${readiness.searchProvider}`,
-        body: 'Die finale Hotelbuchung liegt beim Anbieter. TravelLogik zeigt nur den externen Abschluss fuer Reise- und Kosten-Tracking.'
+        headline: `Extern bestätigt via ${readiness.searchProvider}`,
+        body: 'Die finale Hotelbuchung liegt beim Anbieter. TravelLogik zeigt nur den externen Abschluss für Reise- und Kosten-Tracking.'
       };
     }
     if(readiness.level === 'ready-to-book' || readiness.level === 'precheck-required'){
       return {
         badgeTone: 'precheck',
         headline: `Extern buchen via ${readiness.searchProvider}`,
-        body: 'TravelLogik bereitet nur Tracking-Daten vor. Die Buchung selbst findet weiterhin ausserhalb der App beim Anbieter statt.'
+        body: 'TravelLogik bereitet nur Tracking-Daten vor. Die Buchung selbst findet weiterhin außerhalb der App beim Anbieter statt.'
       };
     }
     if(readiness.level === 'live-search'){
@@ -88,7 +88,7 @@
     return {
       badgeTone: 'demo',
       headline: 'Externer Buchungsfall',
-      body: 'Dieses Hotel ist nur fuer externe Buchung und lokales Tracking vorbereitet. TravelLogik erzeugt keine interne Reservierung.'
+      body: 'Dieses Hotel ist nur für externe Buchung und lokales Tracking vorbereitet. TravelLogik erzeugt keine interne Reservierung.'
     };
   }
 

@@ -227,7 +227,7 @@
 
     if(hasProviderMapping && hasRateCheck && hasPrebook && !hasReservation){
       status = HOTEL_BOOKING_STATUS.READY_TO_BOOK;
-      statusLabel = 'Bereit fuer Buchung';
+      statusLabel = 'Bereit für Buchung';
       technicalStage = 'Precheck liegt vor, Reservation Create fehlt noch';
       missingStep = 'Reservation Create fehlt';
       missingDetail = 'Es gibt noch keine externe Reservierung, solange kein Reservation-Create mit externer Referenz erfolgt.';
@@ -245,8 +245,8 @@
       status = HOTEL_BOOKING_STATUS.FAILED;
       statusLabel = 'Fehlgeschlagen';
       technicalStage = 'Der letzte echte Hotel-Schritt ist fehlgeschlagen';
-      missingStep = 'Fehler pruefen';
-      missingDetail = offer.failureMessage || 'Bitte Provider- oder Persistenzfehler im Backend pruefen.';
+      missingStep = 'Fehler prüfen';
+      missingDetail = offer.failureMessage || 'Bitte Provider- oder Persistenzfehler im Backend prüfen.';
     }
 
     return {

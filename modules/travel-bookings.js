@@ -41,12 +41,12 @@
   function getStatusLabel(status){
     if(status === 'pending' || status === 'received') return 'Eingegangen';
     if(status === 'demo' || status === 'live-search' || status === 'precheck-required' || status === 'ready-to-book' || status === 'prepared' || status === 'proposed') return 'Vorgeschlagen';
-    if(status === 'redirected' || status === 'external-opened') return 'Extern geoeffnet';
+    if(status === 'redirected' || status === 'external-opened') return 'Extern geöffnet';
     if(status === 'external-completed' || status === 'booked' || status === 'external-booked') return 'Extern gebucht';
-    if(status === 'confirmed' || status === 'external-confirmed') return 'Extern bestaetigt';
+    if(status === 'confirmed' || status === 'external-confirmed') return 'Extern bestätigt';
     if(status === 'failed') return 'Fehlgeschlagen';
-    if(status === 'reviewing') return 'In Pruefung';
-    if(status === 'waiting') return 'Rueckmeldung offen';
+    if(status === 'reviewing') return 'In Prüfung';
+    if(status === 'waiting') return 'Rückmeldung offen';
     if(status === 'completed') return 'Abgeschlossen';
     if(status === 'cancelled') return 'Storniert';
     if(status === 'archived') return 'Archiviert';
@@ -139,13 +139,13 @@
       const hotelReservation = booking.hotelReservation || {};
       const normalizedStatus = normalizeStatus(booking.status);
       const nextStep = normalizedStatus === 'proposed'
-        ? 'Hotel extern beim Anbieter oeffnen und danach den Tracking-Status aktualisieren.'
+        ? 'Hotel extern beim Anbieter öffnen und danach den Tracking-Status aktualisieren.'
         : normalizedStatus === 'external-opened'
-          ? 'Wenn der Abschluss erfolgt ist, lokal auf "Extern gebucht" oder direkt auf "Extern bestaetigt" setzen.'
+          ? 'Wenn der Abschluss erfolgt ist, lokal auf "Extern gebucht" oder direkt auf "Extern bestätigt" setzen.'
           : normalizedStatus === 'external-booked'
-            ? 'Bei finaler Bestaetigung den Status auf "Extern bestaetigt" stellen und wenn bekannt Endpreis oder Referenz nachtragen.'
+            ? 'Bei finaler Bestätigung den Status auf "Extern bestätigt" stellen und wenn bekannt Endpreis oder Referenz nachtragen.'
             : normalizedStatus === 'external-confirmed'
-              ? 'Der Hotel-Fall ist fuer Reise- und Kosten-Tracking abgeschlossen und kann bei Bedarf spaeter archiviert werden.'
+              ? 'Der Hotel-Fall ist für Reise- und Kosten-Tracking abgeschlossen und kann bei Bedarf später archiviert werden.'
               : 'Der externe Hotel-Fall bleibt nur noch dokumentiert sichtbar.';
       return [
         `TravelLogik externer Hotel-Fall ${booking.id}`,
@@ -159,17 +159,17 @@
         `Externe URL: ${booking.handoffUrl || hotelReservation.externalUrl || booking.offerUrl || 'nicht gespeichert'}`,
         hotelReservation.externalReservationReference ? `Externe Referenz: ${hotelReservation.externalReservationReference}` : '',
         `Erfasst am: ${formatDateTime(booking.createdAt)}`,
-        booking.lastRedirectedAt ? `Zuletzt extern geoeffnet: ${formatDateTime(latestRedirectAt)}` : '',
+        booking.lastRedirectedAt ? `Zuletzt extern geöffnet: ${formatDateTime(latestRedirectAt)}` : '',
         booking.lastExternalCompletionAt ? `Extern gebucht am: ${formatDateTime(booking.lastExternalCompletionAt)}` : '',
-        booking.confirmedAt ? `Extern bestaetigt am: ${formatDateTime(booking.confirmedAt)}` : '',
+        booking.confirmedAt ? `Extern bestätigt am: ${formatDateTime(booking.confirmedAt)}` : '',
         `Kostenschaetzung: €${booking.total || 0}`,
         finalPrice ? `Finaler Preis: €${finalPrice}` : '',
         booking.handoffSource ? `Quelle: ${booking.handoffSource}` : '',
-        booking.confirmedBy ? `Bestaetigt von: ${booking.confirmedBy}` : '',
+        booking.confirmedBy ? `Bestätigt von: ${booking.confirmedBy}` : '',
         booking.opsNote ? `Ops-Notiz: ${booking.opsNote}` : '',
         '',
         'HINWEIS',
-        'TravelLogik fuehrt Hotels nur als externe Buchungsfaelle fuer Reiseverlauf und Kosten-Tracking. Abschluss, Zahlung und finale Bestaetigung laufen beim Anbieter.',
+        'TravelLogik führt Hotels nur als externe Buchungsfälle für Reiseverlauf und Kosten-Tracking. Abschluss, Zahlung und finale Bestätigung laufen beim Anbieter.',
         '',
         'NAECHSTER SCHRITT',
         nextStep
@@ -191,7 +191,7 @@
       `Pilot-Inbox: ${pilotEmail}`,
       `Pilot-Team: ${pilotLabel}`,
       `Bearbeitet von: ${operatorName}`,
-      `Standard-Rueckmeldung: innerhalb von ${responseTimeHours} Stunden via ${opsContactChannel}`,
+      `Standard-Rückmeldung: innerhalb von ${responseTimeHours} Stunden via ${opsContactChannel}`,
       `Anfrage eingegangen am: ${formatDateTime(booking.createdAt)}`,
       `Letzte Aktivitaet: ${formatDateTime(booking.lastUpdatedAt || booking.createdAt)}`,
       '',
@@ -209,7 +209,7 @@
       'NAECHSTER SCHRITT',
       ['completed','cancelled'].includes(normalizeStatus(booking.status))
         ? 'Vorgang ist abgeschlossen und bleibt als Pilotfall dokumentiert.'
-        : `Bitte manuell pruefen und innerhalb von ${responseTimeHours} Stunden eine erste Rueckmeldung geben.`
+        : `Bitte manuell prüfen und innerhalb von ${responseTimeHours} Stunden eine erste Rückmeldung geben.`
     ].filter(Boolean).join('\n');
   }
 
@@ -217,12 +217,12 @@
     const status = normalizeStatus(booking.status);
     if(isExternalHotelHandoff(booking)){
       if(status === 'redirected') return {label:'Extern abgeschlossen', nextStatus:'external-completed'};
-      if(status === 'external-completed') return {label:'Buchung bestaetigt', nextStatus:'confirmed'};
+      if(status === 'external-completed') return {label:'Buchung bestätigt', nextStatus:'confirmed'};
       return null;
     }
-    if(status === 'received') return {label:'In Pruefung', nextStatus:'reviewing'};
-    if(status === 'reviewing') return {label:'Rueckmeldung offen', nextStatus:'waiting'};
-    if(status === 'waiting') return {label:'Abschliessen', nextStatus:'completed'};
+    if(status === 'received') return {label:'In Prüfung', nextStatus:'reviewing'};
+    if(status === 'reviewing') return {label:'Rückmeldung offen', nextStatus:'waiting'};
+    if(status === 'waiting') return {label:'Abschließen', nextStatus:'completed'};
     return null;
   }
 
@@ -258,7 +258,7 @@
       {id:'all', label:'Alle', count: bookings.filter(booking=>booking.status !== 'cancelled').length},
       {id:'hotels', label:'Nur Hotels', count: bookings.filter(booking=>matchesFilter(booking, 'hotels')).length},
       {id:'requests', label:'Nur Anfragen', count: bookings.filter(booking=>matchesFilter(booking, 'requests')).length},
-      {id:'confirmed', label:'Hotel bestaetigt', count: bookings.filter(booking=>matchesFilter(booking, 'confirmed')).length},
+      {id:'confirmed', label:'Hotel bestätigt', count: bookings.filter(booking=>matchesFilter(booking, 'confirmed')).length},
       {id:'archived', label:'Archiv', count: bookings.filter(booking=>matchesFilter(booking, 'archived')).length},
       {id:'open', label:'Nur offen', count: bookings.filter(booking=>matchesFilter(booking, 'open')).length}
     ];
@@ -299,7 +299,7 @@
             <input id="ops-source-${booking.id}" type="text" value="${escapeHtml(booking.handoffSource || '')}" placeholder="z. B. Booking-Mail, Kunde" style="width:100%;margin-top:.2rem;padding:.45rem .55rem;border:1px solid var(--border);border-radius:8px;background:#fff">
           </label>
           <label style="font-size:.74rem;color:var(--text-light)">
-            Bestaetigt von
+            Bestätigt von
             <input id="ops-confirmed-by-${booking.id}" type="text" value="${escapeHtml(booking.confirmedBy || '')}" placeholder="z. B. Ugo / Kunde" style="width:100%;margin-top:.2rem;padding:.45rem .55rem;border:1px solid var(--border);border-radius:8px;background:#fff">
           </label>
         </div>
@@ -308,7 +308,7 @@
           <textarea id="ops-note-${booking.id}" rows="2" placeholder="Kurze Ops-Notiz zum Handoff oder Abschluss" style="width:100%;margin-top:.2rem;padding:.5rem .55rem;border:1px solid var(--border);border-radius:8px;background:#fff;resize:vertical">${escapeHtml(booking.opsNote || '')}</textarea>
         </label>
         <div style="display:flex;justify-content:space-between;gap:.6rem;align-items:center;flex-wrap:wrap;margin-top:.45rem">
-          <span style="font-size:.72rem;color:var(--text-light)">Lokal und ehrlich gespeichert: Anbieter, externe URL, optionale Referenz, Preise und Status fuer Reise- und Kosten-Tracking.</span>
+          <span style="font-size:.72rem;color:var(--text-light)">Lokal und ehrlich gespeichert: Anbieter, externe URL, optionale Referenz, Preise und Status für Reise- und Kosten-Tracking.</span>
           <button class="btn btn-outline btn-sm" onclick="saveBookingOpsFields('${booking.id}')">Ops-Felder speichern</button>
         </div>
       </div>`;
@@ -316,24 +316,24 @@
 
   function buildOpsLead(copy, pilotConfig, bookings, stats){
     if(!pilotConfig.contactEmail){
-      return 'Pilot-Inbox konfigurieren, bevor externe Tests fuer Anfragepfade live gehen.';
+      return 'Pilot-Inbox konfigurieren, bevor externe Tests für Anfragepfade live gehen.';
     }
-    if(stats.reviewing > 0) return 'Aktive Anfragen befinden sich bereits in Pruefung. Naechster Schritt: manuelle Rueckmeldung vorbereiten.';
-    if(stats.waiting > 0) return 'Offene Rueckmeldungen sichtbar halten und erst nach manuellem Follow-up abschliessen.';
-    if(stats.hotelBooked > 0) return 'Mindestens ein Hotel ist bereits extern gebucht. Jetzt nur noch externe Bestaetigungen und Endpreise sauber nachziehen.';
-    if(stats.hotelOpened > 0) return 'Externe Hotelseiten wurden bereits geoeffnet. Wenn der Abschluss erfolgt ist, den Tracking-Status aktualisieren.';
-    if(stats.hotelProposed > 0) return 'Es gibt vorgeschlagene Hotelfaelle. Naechster Schritt: extern beim Anbieter oeffnen oder bewusst verwerfen.';
+    if(stats.reviewing > 0) return 'Aktive Anfragen befinden sich bereits in Prüfung. Nächster Schritt: manuelle Rückmeldung vorbereiten.';
+    if(stats.waiting > 0) return 'Offene Rückmeldungen sichtbar halten und erst nach manuellem Follow-up abschließen.';
+    if(stats.hotelBooked > 0) return 'Mindestens ein Hotel ist bereits extern gebucht. Jetzt nur noch externe Bestätigungen und Endpreise sauber nachziehen.';
+    if(stats.hotelOpened > 0) return 'Externe Hotelseiten wurden bereits geöffnet. Wenn der Abschluss erfolgt ist, den Tracking-Status aktualisieren.';
+    if(stats.hotelProposed > 0) return 'Es gibt vorgeschlagene Hotelfälle. Nächster Schritt: extern beim Anbieter öffnen oder bewusst verwerfen.';
     if(stats.hotelConfirmed > 0) return 'Externe Hotelbestaetigungen sind sichtbar im Tracking. Reiseverlauf und Kosten bleiben damit sauber nachvollziehbar.';
-    if(stats.hotelTotal > 0 && stats.received === 0) return 'Hotels werden jetzt als externe Buchungsfaelle lokal messbar. Die Buchung selbst bleibt bewusst ausserhalb von TravelLogik.';
+    if(stats.hotelTotal > 0 && stats.received === 0) return 'Hotels werden jetzt als externe Buchungsfälle lokal messbar. Die Buchung selbst bleibt bewusst außerhalb von TravelLogik.';
     if(stats.received > 0){
       const oldestOpen = bookings
         .filter(booking=>['received','reviewing','waiting'].includes(normalizeStatus(booking.status)))
         .sort((a, b)=>new Date(a.createdAt || 0) - new Date(b.createdAt || 0))[0];
       return oldestOpen
-        ? `Naechster echter Ops-Schritt: Anfrage ${oldestOpen.id} pruefen und innerhalb von ${copy.responseWindow} rueckmelden.`
-        : `Naechster echter Ops-Schritt: erste Anfrage innerhalb von ${copy.responseWindow} beantworten.`;
+        ? `Nächster echter Ops-Schritt: Anfrage ${oldestOpen.id} prüfen und innerhalb von ${copy.responseWindow} rückmelden.`
+        : `Nächster echter Ops-Schritt: erste Anfrage innerhalb von ${copy.responseWindow} beantworten.`;
     }
-    return 'Pilotstrecke ist vorbereitet. Jetzt lohnt sich ein externer Test mit echter Pilot-Inbox und manuellem Rueckmeldeversprechen.';
+    return 'Pilotstrecke ist vorbereitet. Jetzt lohnt sich ein externer Test mit echter Pilot-Inbox und manuellem Rückmeldeversprechen.';
   }
 
   function renderHotelBookingCard(booking){
@@ -341,11 +341,11 @@
     const hotelReservation = booking.hotelReservation || {};
     const nextActions = [];
     if(booking.handoffUrl || hotelReservation.externalUrl || booking.offerUrl){
-      nextActions.push(`<button class="btn btn-outline btn-sm" onclick="openExternalHotelHandoff('${booking.id}')">Extern erneut oeffnen</button>`);
+      nextActions.push(`<button class="btn btn-outline btn-sm" onclick="openExternalHotelHandoff('${booking.id}')">Extern erneut öffnen</button>`);
     }
-    if(status === 'proposed') nextActions.push(`<button class="btn btn-outline btn-sm" onclick="updateHotelBookingStatus('${booking.id}','external-opened')">Als extern geoeffnet markieren</button>`);
+    if(status === 'proposed') nextActions.push(`<button class="btn btn-outline btn-sm" onclick="updateHotelBookingStatus('${booking.id}','external-opened')">Als extern geöffnet markieren</button>`);
     if(status === 'proposed' || status === 'external-opened') nextActions.push(`<button class="btn btn-outline btn-sm" onclick="updateHotelBookingStatus('${booking.id}','external-booked')">Als extern gebucht markieren</button>`);
-    if(status !== 'external-confirmed') nextActions.push(`<button class="btn btn-outline btn-sm" onclick="updateHotelBookingStatus('${booking.id}','external-confirmed')">Als extern bestaetigt markieren</button>`);
+    if(status !== 'external-confirmed') nextActions.push(`<button class="btn btn-outline btn-sm" onclick="updateHotelBookingStatus('${booking.id}','external-confirmed')">Als extern bestätigt markieren</button>`);
     if(status !== 'cancelled') nextActions.push(`<button class="btn btn-outline btn-sm" onclick="updateHotelBookingStatus('${booking.id}','cancelled')">Als storniert markieren</button>`);
     if(status !== 'archived') nextActions.push(`<button class="btn btn-outline btn-sm" onclick="updateHotelBookingStatus('${booking.id}','archived')">Archivieren</button>`);
     const statusHistory = Array.isArray(booking.statusHistory) ? booking.statusHistory : [];
@@ -389,7 +389,7 @@
             <div class="booking-mini-value">${escapeHtml(formatDate(booking.checkOut))}</div>
           </div>
           <div class="booking-mini-card">
-            <div class="booking-mini-label">Gaeste</div>
+            <div class="booking-mini-label">Gäste</div>
             <div class="booking-mini-value">${escapeHtml(String(booking.guests || 1))}</div>
           </div>
           <div class="booking-mini-card">
@@ -434,8 +434,8 @@
           </div>
           ${isPreparedHotelBooking(booking) ? `
           <div class="booking-mini-card booking-mini-card-wide">
-            <div class="booking-mini-label">Naechster Tracking-Schritt</div>
-            <div class="booking-mini-value">${escapeHtml(status === 'proposed' ? 'Extern beim Anbieter oeffnen' : status === 'external-opened' ? 'Externen Abschluss markieren' : 'Finale externe Bestaetigung nachziehen')}</div>
+            <div class="booking-mini-label">Nächster Tracking-Schritt</div>
+            <div class="booking-mini-value">${escapeHtml(status === 'proposed' ? 'Extern beim Anbieter öffnen' : status === 'external-opened' ? 'Externen Abschluss markieren' : 'Finale externe Bestätigung nachziehen')}</div>
           </div>
           <div class="booking-mini-card booking-mini-card-wide">
             <div class="booking-mini-label">Kostenstatus</div>
@@ -467,7 +467,7 @@
                 </div>
                 <div class="booking-mini-card booking-mini-card-wide">
                   <div class="booking-mini-label">Externe Buchung</div>
-                  <div class="booking-mini-value">TravelLogik bucht dieses Hotel nicht selbst. Der Anbieter-Link und der externe Status werden nur fuer Tracking gespeichert.</div>
+                  <div class="booking-mini-value">TravelLogik bucht dieses Hotel nicht selbst. Der Anbieter-Link und der externe Status werden nur für Tracking gespeichert.</div>
                 </div>
               </div>
             </div>
@@ -495,21 +495,21 @@
               </div>
             </div>
             <div class="booking-detail-block">
-              <div class="booking-detail-block-title">Naechste lokale Aktion</div>
+              <div class="booking-detail-block-title">Nächste lokale Aktion</div>
               <div class="booking-detail-callout">
                 ${status === 'external-confirmed'
-                  ? 'Die externe Hotelbuchung ist bestaetigt und dient jetzt nur noch dem Reise- und Kosten-Tracking.'
+                  ? 'Die externe Hotelbuchung ist bestätigt und dient jetzt nur noch dem Reise- und Kosten-Tracking.'
                   : isPreparedHotelBooking(booking)
                   ? status === 'proposed'
-                    ? 'Hotel extern beim Anbieter oeffnen und danach den Tracking-Status aktualisieren.'
+                    ? 'Hotel extern beim Anbieter öffnen und danach den Tracking-Status aktualisieren.'
                     : status === 'external-opened'
-                      ? 'Sobald die Buchung ausserhalb von TravelLogik erfolgt, lokal auf "Extern gebucht" setzen.'
-                      : 'Falls die Buchung final bestaetigt ist, lokal auf "Extern bestaetigt" wechseln.'
+                      ? 'Sobald die Buchung außerhalb von TravelLogik erfolgt, lokal auf "Extern gebucht" setzen.'
+                      : 'Falls die Buchung final bestätigt ist, lokal auf "Extern bestätigt" wechseln.'
                   : status === 'cancelled'
                   ? 'Aufenthalt ist lokal als storniert markiert und bleibt nur noch dokumentiert sichtbar.'
                   : status === 'archived'
                   ? 'Eintrag ist archiviert. Nur bei Bedarf wieder als aktive Referenz nutzen.'
-                  : 'Status lokal sauber nachziehen, damit Hotels in TravelLogik ehrlich als externe Buchungsfaelle sichtbar bleiben.'}
+                  : 'Status lokal sauber nachziehen, damit Hotels in TravelLogik ehrlich als externe Buchungsfälle sichtbar bleiben.'}
               </div>
             </div>
           </div>
@@ -537,8 +537,8 @@
       <td style="display:flex;gap:.4rem;flex-wrap:wrap">
         ${getPrimaryAction(booking) ? `<button class="btn btn-primary btn-sm" onclick="updatePilotRequestStatus('${booking.id}','${getPrimaryAction(booking).nextStatus}')">${getPrimaryAction(booking).label}</button>` : ''}
         ${isExternalHotelHandoff(booking)
-          ? `<button class="btn btn-primary btn-sm" onclick="openExternalHotelHandoff('${booking.id}')">Erneut extern oeffnen</button>
-        <button class="btn btn-outline btn-sm" onclick="startHotelRequestFromHandoff('${booking.id}')">Rueckfrage daraus starten</button>`
+          ? `<button class="btn btn-primary btn-sm" onclick="openExternalHotelHandoff('${booking.id}')">Erneut extern öffnen</button>
+        <button class="btn btn-outline btn-sm" onclick="startHotelRequestFromHandoff('${booking.id}')">Rückfrage daraus starten</button>`
           : `<button class="btn btn-outline btn-sm" onclick="copyPilotRequest('${booking.id}')">Text kopieren</button>
         <button class="btn btn-outline btn-sm" onclick="openPilotRequest('${booking.id}')">An Pilot-Inbox senden</button>`}
         <button class="btn btn-outline btn-sm" onclick="cancelBooking('${booking.id}')">Verwerfen</button>
@@ -562,9 +562,9 @@
       <div class="price-summary" style="margin-top:0">
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.8rem">
           <div>
-            <div class="insight-label">Externe Hotelfaelle</div>
+            <div class="insight-label">Externe Hotelfälle</div>
             <div style="font-weight:700">${stats.hotelProposed + stats.hotelOpened + stats.hotelBooked + stats.hotelConfirmed}</div>
-            <div style="font-size:.78rem;color:var(--text-light)">${stats.hotelProposed} vorgeschlagen · ${stats.hotelOpened} extern geoeffnet · ${stats.hotelBooked} extern gebucht · ${stats.hotelConfirmed} extern bestaetigt</div>
+            <div style="font-size:.78rem;color:var(--text-light)">${stats.hotelProposed} vorgeschlagen · ${stats.hotelOpened} extern geöffnet · ${stats.hotelBooked} extern gebucht · ${stats.hotelConfirmed} extern bestätigt</div>
           </div>
           <div>
             <div class="insight-label">Anfragepfade</div>
@@ -577,7 +577,7 @@
             <div style="font-size:.78rem;color:var(--text-light)">${pilotConfig.contactLabel || 'TravelLogik Pilotdesk'}</div>
           </div>
           <div>
-            <div class="insight-label">Standard-Rueckmeldung</div>
+            <div class="insight-label">Standard-Rückmeldung</div>
             <div style="font-weight:700">innerhalb von ${responseWindow}</div>
             <div style="font-size:.78rem;color:var(--text-light)">Kontaktweg: ${contactChannel}</div>
           </div>
@@ -586,7 +586,7 @@
       </div>`;
 
     if(bookings.length === 0){
-      container.innerHTML = `${opsSummaryHtml}${renderFilterBar(bookings)}<div class="empty-state"><div class="icon">📭</div><div>Noch keine Buchungen oder Anfragen vorhanden</div><small>Hotels erscheinen hier als externe Buchungsfaelle fuer Reise- und Kosten-Tracking. Fluege, Mietwagen und Transfers bleiben unveraendert.</small></div>`;
+      container.innerHTML = `${opsSummaryHtml}${renderFilterBar(bookings)}<div class="empty-state"><div class="icon">📭</div><div>Noch keine Buchungen oder Anfragen vorhanden</div><small>Hotels erscheinen hier als externe Buchungsfälle für Reise- und Kosten-Tracking. Fluege, Mietwagen und Transfers bleiben unveraendert.</small></div>`;
       return;
     }
 
@@ -599,7 +599,7 @@
         <div class="booking-section-head">
           <div>
             <div class="card-title" style="margin-bottom:.35rem">🏨 Externe Hotelbuchungen & Tracking</div>
-            <div class="inline-note">Hotels werden hier nur als externe Buchungsfaelle gefuehrt. TravelLogik speichert Reise- und Kostendaten, nicht die eigentliche Reservierung.</div>
+            <div class="inline-note">Hotels werden hier nur als externe Buchungsfälle geführt. TravelLogik speichert Reise- und Kostendaten, nicht die eigentliche Reservierung.</div>
           </div>
         </div>
         <div class="booking-entry-list">
@@ -609,16 +609,16 @@
         <div class="booking-section-head" style="margin-top:${hotelBookings.length ? '1.2rem' : '0'}">
           <div>
             <div class="card-title" style="margin-bottom:.35rem">🧭 Anfragepfade</div>
-            <div class="inline-note">Nur diese Eintraege brauchen manuellen Follow-up, Pilot-Inbox oder eine externe Weiterleitung.</div>
+            <div class="inline-note">Nur diese Einträge brauchen manuellen Follow-up, Pilot-Inbox oder eine externe Weiterleitung.</div>
           </div>
         </div>
         <table class="bookings-table">
           <thead><tr><th>Nr.</th><th>Typ</th><th>Anfrage</th><th>Details</th><th>Betrag</th><th>Status</th><th></th></tr></thead>
           <tbody>${requestBookings.map(renderRequestRow).join('')}</tbody>
         </table>` : ''}
-    ` : `<div class="empty-state"><div class="icon">🔎</div><div>Keine Eintraege fuer diesen Filter</div><small>Wechseln Sie den Filter oder erfassen Sie einen neuen externen Hotelfall beziehungsweise eine Anfrage.</small></div>`}
+    ` : `<div class="empty-state"><div class="icon">🔎</div><div>Keine Einträge für diesen Filter</div><small>Wechseln Sie den Filter oder erfassen Sie einen neuen externen Hotelfall beziehungsweise eine Anfrage.</small></div>`}
     <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
-      <div style="font-size:.9rem;color:var(--text-light)">${visibleCount} von ${bookings.length} sichtbaren Eintrag(en) · Gesamt: <strong>€${total}</strong><br><span style="font-size:.76rem">Hotels erscheinen hier nur als externe Tracking-Faelle. "Extern gebucht" und "Extern bestaetigt" dienen ausschliesslich Reiseverlauf und Kosten-Tracking.</span></div>
+      <div style="font-size:.9rem;color:var(--text-light)">${visibleCount} von ${bookings.length} sichtbaren Eintrag(en) · Gesamt: <strong>€${total}</strong><br><span style="font-size:.76rem">Hotels erscheinen hier nur als externe Tracking-Fälle. "Extern gebucht" und "Extern bestätigt" dienen ausschließlich Reiseverlauf und Kosten-Tracking.</span></div>
       <button class="btn btn-outline btn-sm" onclick="clearBookings()">Alle löschen</button>
     </div>`;
   }

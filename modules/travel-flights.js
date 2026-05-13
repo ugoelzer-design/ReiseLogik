@@ -232,7 +232,7 @@
       from ? `von ${from}` : '',
       to ? `nach ${to}` : '',
       dep ? `am ${dep}` : '',
-      ret ? `zurueck ${ret}` : '',
+      ret ? `zurück ${ret}` : '',
       `${pax} Personen`
     ].filter(Boolean).join(' ');
     global.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, '_blank', 'noopener');

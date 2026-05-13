@@ -2,17 +2,17 @@
   'use strict';
 
   const MVP_ROADMAP = [
-    {phase:'Heute nutzbar', status:'live', title:'Hostbare Beta mit erster Selbstbuchungsroute', text:'Klassische Hotels koennen bereits direkt in TravelLogik gebucht werden; Fluege, Mietwagen und Transfers bleiben klar als Anfrage oder Vorbereitung gefuehrt.'},
-    {phase:'Naechster Schritt', status:'next', title:'Belastbare Hotel-Selbstbuchung', text:'Mehr echte Hoteldaten, klarere Buchungsbestaetigungen und sauberere Statuswechsel zwischen buchbar, anfragbar und vorbereitet.'},
-    {phase:'Danach', status:'next', title:'Bundles & Assistenz', text:'Cross-Sell-Logik aus Flug, Hotel, Transfer und Mietwagen, um konkrete Reisevorschlaege schneller in buchbare Pakete zu ueberfuehren.'},
-    {phase:'Spaeter', status:'later', title:'Content- und Community-Layer', text:'Guides, Bewertungen und wiederkehrende Nutzersignale koennen spaeter Vertrauen und Wiederkehr weiter staerken.'}
+    {phase:'Heute nutzbar', status:'live', title:'Hostbare Beta mit erster Selbstbuchungsroute', text:'Klassische Hotels können bereits direkt in TravelLogik gebucht werden; Fluege, Mietwagen und Transfers bleiben klar als Anfrage oder Vorbereitung geführt.'},
+    {phase:'Nächster Schritt', status:'next', title:'Belastbare Hotel-Selbstbuchung', text:'Mehr echte Hoteldaten, klarere Buchungsbestaetigungen und sauberere Statuswechsel zwischen buchbar, anfragbar und vorbereitet.'},
+    {phase:'Danach', status:'next', title:'Bundles & Assistenz', text:'Cross-Sell-Logik aus Flug, Hotel, Transfer und Mietwagen, um konkrete Reisevorschlaege schneller in buchbare Pakete zu überführen.'},
+    {phase:'Später', status:'later', title:'Content- und Community-Layer', text:'Guides, Bewertungen und wiederkehrende Nutzersignale können später Vertrauen und Wiederkehr weiter staerken.'}
   ];
 
   const MONETIZATION_MODELS = [
     {title:'Klare Datenherkunft', text:'Jede Suche sollte erkennbar machen, ob Ergebnisse aus Demo-Daten, Live-APIs oder vorbereiteten Integrationen stammen.'},
-    {title:'Weniger Overpromise', text:'Nur klassische Hotels versprechen heute eine lokale Selbstbuchung in TravelLogik. Alles andere bleibt bewusst Anfrage, Rueckfrage oder Vorbereitung.'},
-    {title:'Erstnutzer sicher fuehren', text:'Leere Zustaende, Suchvorschlaege und naechste Schritte reduzieren Reibung und machen den Nutzen schneller sichtbar.'},
-    {title:'Hosting-freundliche Grundlagen', text:'Konfigurierbare Datenquellen, defensive Speicherung und saubere Fallbacks erleichtern den Uebergang von lokal zu gehostet.'}
+    {title:'Weniger Overpromise', text:'Nur klassische Hotels versprechen heute eine lokale Selbstbuchung in TravelLogik. Alles andere bleibt bewusst Anfrage, Rückfrage oder Vorbereitung.'},
+    {title:'Erstnutzer sicher führen', text:'Leere Zustände, Suchvorschlaege und nächste Schritte reduzieren Reibung und machen den Nutzen schneller sichtbar.'},
+    {title:'Hosting-freundliche Grundlagen', text:'Konfigurierbare Datenquellen, defensive Speicherung und saubere Fallbacks erleichtern den Übergang von lokal zu gehostet.'}
   ];
 
   const PRODUCT_MODELS = [
@@ -87,7 +87,7 @@
     const activeSearches = [flightData.length, hotelData.length, carData.length].filter(Boolean).length;
     const cards = [
       {value:'3', label:'MVP-Module live'},
-      {value:`${totalHandoffs} / ${confirmedHotelBookings}`, label:'Hotelbuchungen / bestaetigt'},
+      {value:`${totalHandoffs} / ${confirmedHotelBookings}`, label:'Hotelbuchungen / bestätigt'},
       {value:`€${totalVolume}`, label:'Gespeichertes Testvolumen'},
       {value:activeSearches || '0', label:`Aktive Suchkontexte · ${profile.priority || 'value'}`}
     ];
@@ -122,7 +122,7 @@ function renderTripTimeline(){
         if(history.to === 'booked' || history.to === 'confirmed'){
           events.push({
             date: new Date(history.at || Date.now()),
-            type: history.to === 'booked' ? 'Gebucht' : 'Bestaetigt',
+            type: history.to === 'booked' ? 'Gebucht' : 'Bestätigt',
             title: booking.name,
             detail: `Status-Update: ${history.to}`,
             icon: '✅'

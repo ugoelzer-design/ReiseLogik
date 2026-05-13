@@ -63,32 +63,32 @@
       checkOutUntil: hotel.stars >= 4 ? '12:00' : '11:00',
       frontDesk: hotel.stars >= 4 ? '24/7 Rezeption' : 'Rezeption bis 22:00',
       policyNote: family
-        ? 'Kinderbett und ruhiges Zimmer koennen lokal im Hinweisfeld vermerkt werden.'
-        : 'Spaete Anreise und hohe Etage koennen lokal im Hinweisfeld markiert werden.',
+        ? 'Kinderbett und ruhiges Zimmer können lokal im Hinweisfeld vermerkt werden.'
+        : 'Spaete Anreise und hohe Etage können lokal im Hinweisfeld markiert werden.',
       idealFor: family
         ? 'Familien, laengere Aufenthalte und entspannte Selbstbuchung'
         : hotel.tags.includes('Shuttle')
         ? 'Kurzaufenthalte, Business-Trips und spaete Anreise'
         : 'Staedtereise, flexible Raten und klassische Hotelbuchung',
       reviewSnippet: hotel.stars >= 5
-        ? 'Gaeste heben vor allem die ruhige Ankunft, das Fruehstueck und den verlässlichen Standard hervor.'
-        : 'Gaeste beschreiben das Haus als solide, gut erreichbar und fuer direkte Aufenthalte angenehm unkompliziert.',
+        ? 'Gäste heben vor allem die ruhige Ankunft, das Frühstück und den verlässlichen Standard hervor.'
+        : 'Gäste beschreiben das Haus als solide, gut erreichbar und für direkte Aufenthalte angenehm unkompliziert.',
       localHighlights: hotel.tags.slice(0, 3),
       nearbySpots: nearbyBase.map((spot, index)=>`${spot} · ${8 + index * 4} Min`),
       airportMinutes: airportMinutesBase + (hotel.stars >= 4 ? 4 : 0),
       airportAccessLabel: airportMinutesBase <= 15
         ? 'Sehr nah am Flughafen'
         : airportMinutesBase <= 25
-        ? 'Gut fuer Flughafenankunft'
+        ? 'Gut für Flughafenankunft'
         : 'Eher stadtorientiert',
       transportNote: hotel.tags.includes('Shuttle')
-        ? 'Shuttle und Flughafenbezug machen das Haus fuer spaete Ankunft glaubwuerdig.'
+        ? 'Shuttle und Flughafenbezug machen das Haus für spaete Ankunft glaubwürdig.'
         : 'Lokale Anfahrt per Taxi oder Transfer bleibt vorbereitbar, ohne den Hotel-Checkout aufzublasen.',
       amenityBlocks: [
         {
           title:'Hausprofil',
           items:[
-            hotel.stars >= 4 ? 'Frueher Check-in auf Anfrage' : 'Klassischer Empfangsbereich',
+            hotel.stars >= 4 ? 'Früher Check-in auf Anfrage' : 'Klassischer Empfangsbereich',
             hotel.tags.includes('Restaurant') ? 'Restaurant im Haus' : 'Snacks / Lobbybereich',
             hotel.tags.includes('Spa') ? 'Wellnessbereich' : 'Ruhige Aufenthaltsbereiche'
           ]
@@ -106,18 +106,18 @@
   }
 
   function buildRoomOptions(hotel, params, basePrice){
-    const guestLabel = params.adults > 1 ? `${params.adults} Gaeste` : '1 Gast';
+    const guestLabel = params.adults > 1 ? `${params.adults} Gäste` : '1 Gast';
     const selectedRooms = Math.max(1, params.rooms || 1);
     const roomVariants = [
       {
         label:'Comfort Zimmer',
-        board:'Ohne Fruehstueck',
+        board:'Ohne Frühstück',
         boardCode:'room-only',
         cancellationType:'strict',
         cancellationLabel:'Nicht kostenfrei stornierbar',
         flexibilityLabel:'Fixer Tarif',
         priceDelta:0,
-        note:'Solide Basisrate fuer die aktuelle Auswahl.',
+        note:'Solide Basisrate für die aktuelle Auswahl.',
         badges:['Basis', guestLabel],
         maxGuestsPerRoom:2,
         bedding:'1 Doppelbett oder 2 Twin Beds',
@@ -126,14 +126,14 @@
       },
       {
         label:'Comfort Plus',
-        board:'Fruehstueck inklusive',
+        board:'Frühstück inklusive',
         boardCode:'breakfast',
         cancellationType:'semi-flex',
         cancellationLabel:'Kostenfrei stornierbar bis 3 Tage vor Anreise, danach 1 Nacht',
         flexibilityLabel:'Teilflexibel',
         priceDelta:18,
-        note:'Beliebte Rate mit Fruehstueck und ruhigerem Profil.',
-        badges:['Fruehstueck', guestLabel],
+        note:'Beliebte Rate mit Frühstück und ruhigerem Profil.',
+        badges:['Frühstück', guestLabel],
         maxGuestsPerRoom:2,
         bedding:'1 Queen Bed',
         roomSize:'26 m²',
@@ -141,7 +141,7 @@
       },
       {
         label: hotel.stars >= 4 ? 'Deluxe Flex' : 'Superior Flex',
-        board:'Fruehstueck inklusive',
+        board:'Frühstück inklusive',
         boardCode:'breakfast',
         cancellationType:'flex',
         cancellationLabel:'Kostenfrei stornierbar bis 18:00 Uhr, 2 Tage vor Anreise',
@@ -165,7 +165,7 @@
       const recommendedRooms = Math.max(1, Math.ceil(params.adults / variant.maxGuestsPerRoom));
       const occupancyLabel = occupancyFits
         ? `${params.adults} Gast${params.adults > 1 ? 'e' : ''} in ${selectedRooms} Zimmer passend`
-        : `Fuer ${params.adults} Gaeste besser ${recommendedRooms} Zimmer einplanen`;
+        : `Für ${params.adults} Gäste besser ${recommendedRooms} Zimmer einplanen`;
       return {
         id: optionId,
         providerRoomId:'',
@@ -462,7 +462,7 @@
         runtime.renderHotelSourceStatus({
           mode:'live',
           label:'Live-Daten aktiv',
-          detail:'Objektsuche kommt live ueber Google Places; Raten und Verfuegbarkeit sind noch nicht provider-verifiziert'
+          detail:'Objektsuche kommt live über Google Places; Raten und Verfügbarkeit sind noch nicht provider-verifiziert'
         });
         loader.classList.remove('show');
         document.getElementById('hotel-results').style.display = 'block';
@@ -489,7 +489,7 @@
         runtime.renderHotelSourceStatus({
           mode: 'live',
           label: 'Mock Service aktiv',
-          detail: 'Simuliert eine echte Backend-Anbindung fuer den Buchungsprozess.'
+          detail: 'Simuliert eine echte Backend-Anbindung für den Buchungsprozess.'
         });
         loader.classList.remove('show');
         document.getElementById('hotel-results').style.display = 'block';

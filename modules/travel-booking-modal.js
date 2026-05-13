@@ -219,10 +219,10 @@
     const reservation = record.hotelReservation || {};
     const detailRows = [
       ['Externe Referenz', reservation.externalReservationReference || record.externalReservationReference || 'Nicht vorhanden'],
-      ['Status', record.statusLabel || 'Extern bestaetigt'],
+      ['Status', record.statusLabel || 'Extern bestätigt'],
       ['Check-in', formatDate(record.checkIn)],
       ['Check-out', formatDate(record.checkOut)],
-      ['Gaeste', `${record.guests || 1}`],
+      ['Gäste', `${record.guests || 1}`],
       ['Zimmer', `${record.rooms || 1}`],
       ['Zimmer / Tarif', record.roomRateHint || 'Noch kein Tarifhinweis'],
       ['Verpflegung', record.boardType || 'Nicht hinterlegt'],
@@ -236,7 +236,7 @@
       ['Kontakt', record.contactName || 'Nicht hinterlegt'],
       ['E-Mail', record.contactEmail || 'Nicht hinterlegt'],
       ['Telefon', record.contactPhone || 'Nicht hinterlegt'],
-      ['Extern bestaetigt am', formatDateTime(record.confirmedAt || record.createdAt)]
+      ['Extern bestätigt am', formatDateTime(record.confirmedAt || record.createdAt)]
     ];
     return `
       <div class="booking-confirm-grid">
@@ -259,7 +259,7 @@
         </div>` : ''}
       <div class="booking-confirm-note">
         <strong>Produktstand</strong>
-        <div>TravelLogik fuehrt dieses Hotel nur als externen Buchungsfall. Die eigentliche Buchung lief beim Anbieter und wird hier ausschliesslich fuer Reise- und Kosten-Tracking dokumentiert.</div>
+        <div>TravelLogik führt dieses Hotel nur als externen Buchungsfall. Die eigentliche Buchung lief beim Anbieter und wird hier ausschließlich für Reise- und Kosten-Tracking dokumentiert.</div>
       </div>`;
   }
 
@@ -270,7 +270,7 @@
       ['Status', record.statusLabel || 'Vorgeschlagen'],
       ['Check-in', formatDate(record.checkIn)],
       ['Check-out', formatDate(record.checkOut)],
-      ['Gaeste', `${record.guests || 1}`],
+      ['Gäste', `${record.guests || 1}`],
       ['Zimmer', `${record.rooms || 1}`],
       ['Zimmer / Tarif', record.roomRateHint || 'Noch kein Tarifhinweis'],
       ['Verpflegung', record.boardType || 'Nicht hinterlegt'],
@@ -300,7 +300,7 @@
         </div>` : ''}
       <div class="booking-confirm-note">
         <strong>Ehrlicher Produktstand</strong>
-        <div>TravelLogik fuehrt diesen Hotel-Fall nur fuer Reiseverlauf und Kosten-Tracking. Der Abschluss passiert extern beim Anbieter und wird hier nicht simuliert.</div>
+        <div>TravelLogik führt diesen Hotel-Fall nur für Reiseverlauf und Kosten-Tracking. Der Abschluss passiert extern beim Anbieter und wird hier nicht simuliert.</div>
       </div>`;
   }
 
@@ -416,7 +416,7 @@
             <label>Geplante Ankunft</label>
             <select id="hotel-arrival-window">
               <option>Nachmittag (14:00-18:00)</option>
-              <option>Frueher Abend (18:00-21:00)</option>
+              <option>Früher Abend (18:00-21:00)</option>
               <option>Spaete Anreise (nach 21:00)</option>
             </select>
           </div>
@@ -433,7 +433,7 @@
         <div class="form-group">
           <label>Bettwunsch</label>
           <select id="hotel-bed-preference">
-            <option>Beste verfuegbare Option</option>
+            <option>Beste verfügbare Option</option>
             <option>Doppelbett bevorzugt</option>
             <option>Getrennte Betten bevorzugt</option>
             <option>Familienaufstellung wenn moeglich</option>
@@ -468,8 +468,8 @@
       } else {
         requestTypeEl.disabled = false;
         requestTypeEl.innerHTML = `
-          <option>🔎 Angebot pruefen</option>
-          <option>📞 Rueckruf anfordern</option>
+          <option>🔎 Angebot prüfen</option>
+          <option>📞 Rückruf anfordern</option>
           <option>🧭 Beratung starten</option>`;
       }
     }
@@ -550,7 +550,7 @@
       ${html}
       <div class="booking-confirm-note" style="margin-top:.2rem">
         <strong>Hauptgast</strong>
-        <div>TravelLogik nutzt diese Angaben lokal nur fuer Reiseverlauf und Kosten-Tracking. Die Hotelbuchung selbst findet extern beim Anbieter statt.</div>
+        <div>TravelLogik nutzt diese Angaben lokal nur für Reiseverlauf und Kosten-Tracking. Die Hotelbuchung selbst findet extern beim Anbieter statt.</div>
       </div>`;
   }
 
@@ -585,7 +585,7 @@
           `).join('')}
         </div>
         <div class="booking-confirm-note" style="margin-top:.8rem">
-          <strong>Aktuell gewaehlt</strong>
+          <strong>Aktuell gewählt</strong>
           <div>${escapeHtml(selectedOption.rateName)} · ${escapeHtml(selectedOption.note)}</div>
           <div style="margin-top:.35rem">${escapeHtml(buildHotelRoomFacts(offer))}</div>
         </div>` : ''}`;
@@ -631,11 +631,11 @@
     const email = document.getElementById('contact-email')?.value.trim() || '';
     const phone = document.getElementById('request-phone')?.value.trim() || '';
     const notes = document.getElementById('request-notes')?.value.trim() || '';
-    const requestType = document.getElementById('request-type')?.value || 'Angebot pruefen';
+    const requestType = document.getElementById('request-type')?.value || 'Angebot prüfen';
     const preferredChannel = document.getElementById('request-channel')?.value || 'E-Mail';
     const consent = !!document.getElementById('request-consent')?.checked;
     if(!name || !email || !consent){
-      alert('Bitte Kontaktangaben und Einwilligung fuer die Anfrage ergaenzen.');
+      alert('Bitte Kontaktangaben und Einwilligung für die Anfrage ergaenzen.');
       return false;
     }
     persistRecentContact({
@@ -681,7 +681,7 @@
     });
     const isHotelBooking = currentBookingItem.type === 'hotel';
     if(confirmRef) confirmRef.textContent = ref;
-    if(confirmEmail) confirmEmail.textContent = isHotelBooking ? (email || 'lokal in TravelLogik gespeichert') : (pilotEmail || `${pilotLabel} (manuelle Uebergabe)`);
+    if(confirmEmail) confirmEmail.textContent = isHotelBooking ? (email || 'lokal in TravelLogik gespeichert') : (pilotEmail || `${pilotLabel} (manuelle Übergabe)`);
 
     if(isHotelBooking){
       const tripContext = offer.tripContext || {};
@@ -721,7 +721,7 @@
         `Details: ${record.detail}`,
         `Check-in: ${formatDate(tripContext.startDate)}`,
         `Check-out: ${formatDate(tripContext.endDate)}`,
-        `Gaeste: ${tripContext.pax || 1}`,
+        `Gäste: ${tripContext.pax || 1}`,
         `Zimmer: ${rooms}`,
         `Zimmer / Tarif: ${roomRateHint}`,
         offer.roomOptionNote ? `Tarifdetail: ${offer.roomOptionNote}` : '',
@@ -741,7 +741,7 @@
         notes ? `Hinweise: ${notes}` : '',
         '',
         'NAECHSTER SCHRITT',
-        'Hotel extern beim Anbieter buchen oder oeffnen und danach den Tracking-Status in TravelLogik aktualisieren.'
+        'Hotel extern beim Anbieter buchen oder öffnen und danach den Tracking-Status in TravelLogik aktualisieren.'
       ].filter(Boolean).join('\n');
       const hotelRecord = {
         ...record,
@@ -795,18 +795,18 @@
       if(confirmRef) confirmRef.textContent = hotelReservation.externalReservationReference || ref;
       if(confirmEmail) confirmEmail.textContent = email || 'lokal gespeichert';
       if(confirmBannerTitle) confirmBannerTitle.textContent = 'Externer Hotelfall gespeichert.';
-      if(confirmBannerText) confirmBannerText.textContent = 'Die Auswahl wurde fuer Reise- und Kosten-Tracking gespeichert. Die eigentliche Hotelbuchung findet weiterhin beim Anbieter statt.';
-      if(confirmNext) confirmNext.textContent = 'Naechster Schritt: extern buchen oder Anbieter-Link oeffnen und danach den Tracking-Status in der Buchungsansicht aktualisieren.';
+      if(confirmBannerText) confirmBannerText.textContent = 'Die Auswahl wurde für Reise- und Kosten-Tracking gespeichert. Die eigentliche Hotelbuchung findet weiterhin beim Anbieter statt.';
+      if(confirmNext) confirmNext.textContent = 'Nächster Schritt: extern buchen oder Anbieter-Link öffnen und danach den Tracking-Status in der Buchungsansicht aktualisieren.';
       if(confirmDetails) confirmDetails.innerHTML = buildHotelPreparationDetails(hotelRecord);
       if(confirmPilotBox){
         confirmPilotBox.innerHTML = `
           <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.75rem">
             <button class="btn btn-primary btn-sm" onclick="showPage('page-bookings')">Zu Buchungen</button>
             <button class="btn btn-outline btn-sm" onclick="copyPilotRequest('${ref}')">Tracking-Details kopieren</button>
-            ${externalUrl ? `<button class="btn btn-outline btn-sm" onclick="window.open(${JSON.stringify(externalUrl)},'_blank','noopener')">Extern oeffnen</button>` : ''}
+            ${externalUrl ? `<button class="btn btn-outline btn-sm" onclick="window.open(${JSON.stringify(externalUrl)},'_blank','noopener')">Extern öffnen</button>` : ''}
             <button class="btn btn-outline btn-sm" onclick="downloadBookingCalendar('${ref}')">In Kalender notieren</button>
           </div>
-          <div style="font-size:.76rem;color:var(--text-light);margin-top:.55rem">${escapeHtml('TravelLogik fuehrt dieses Hotel nur fuer Kosten und Reiseverlauf. Abschluss und Bestaetigung laufen extern beim Anbieter.')}</div>`;
+          <div style="font-size:.76rem;color:var(--text-light);margin-top:.55rem">${escapeHtml('TravelLogik führt dieses Hotel nur für Kosten und Reiseverlauf. Abschluss und Bestätigung laufen extern beim Anbieter.')}</div>`;
       }
 
       const doneKey = runtime.getModuleMeta(currentBookingItem.type).doneKey;
@@ -824,7 +824,7 @@
       `Pilot-Inbox: ${pilotEmail || 'manuelle Weitergabe erforderlich'}`,
       `Pilot-Team: ${pilotLabel}`,
       `Bearbeitet von: ${operatorName}`,
-      `Standard-Rueckmeldung: innerhalb von ${responseTimeHours} Stunden via ${opsContactChannel}`,
+      `Standard-Rückmeldung: innerhalb von ${responseTimeHours} Stunden via ${opsContactChannel}`,
       `Anfrage eingegangen am: ${createdAtLabel}`,
       '',
       `Modul: ${runtime.getModuleMeta(currentBookingItem.type).label}`,
@@ -839,7 +839,7 @@
       notes ? `Hinweise: ${notes}` : '',
       '',
       'NAECHSTER SCHRITT',
-      `Bitte die Auswahl manuell pruefen und innerhalb von ${responseTimeHours} Stunden eine erste Rueckmeldung geben.`
+      `Bitte die Auswahl manuell prüfen und innerhalb von ${responseTimeHours} Stunden eine erste Rückmeldung geben.`
     ].filter(Boolean).join('\n');
     const enrichedRecord = {
       ...record,
@@ -873,20 +873,20 @@
 
     if(confirmStatus) confirmStatus.textContent = 'Eingegangen';
     if(confirmRef) confirmRef.textContent = ref;
-    if(confirmEmail) confirmEmail.textContent = pilotEmail || `${pilotLabel} (manuelle Uebergabe)`;
+    if(confirmEmail) confirmEmail.textContent = pilotEmail || `${pilotLabel} (manuelle Übergabe)`;
     if(confirmBannerTitle) confirmBannerTitle.textContent = 'Anfrage lokal vorbereitet.';
-    if(confirmBannerText) confirmBannerText.textContent = 'Die Auswahl wurde gespeichert und fuer die manuelle Weiterbearbeitung vorbereitet.';
+    if(confirmBannerText) confirmBannerText.textContent = 'Die Auswahl wurde gespeichert und für die manuelle Weiterbearbeitung vorbereitet.';
     if(confirmDetails) confirmDetails.innerHTML = '';
     if(confirmNext) confirmNext.textContent = pilotEmail
-      ? `${pilotLabel} bearbeitet diese Anfrage manuell. Erste Rueckmeldung idealerweise innerhalb von ${responseTimeHours} Stunden via ${opsContactChannel}.`
-      : `Die Anfrage ist als sauberer Pilotfall vorbereitet. Fuer echten externen Test jetzt noch eine Pilot-Inbox konfigurieren oder den Text manuell weitergeben.`;
+      ? `${pilotLabel} bearbeitet diese Anfrage manuell. Erste Rückmeldung idealerweise innerhalb von ${responseTimeHours} Stunden via ${opsContactChannel}.`
+      : `Die Anfrage ist als sauberer Pilotfall vorbereitet. Für echten externen Test jetzt noch eine Pilot-Inbox konfigurieren oder den Text manuell weitergeben.`;
     if(confirmPilotBox){
       confirmPilotBox.innerHTML = `
         <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.75rem">
           <button class="btn btn-primary btn-sm" onclick="openPilotRequest('${ref}')">${pilotEmail ? 'An Pilot-Inbox senden' : 'Anfragetext anzeigen'}</button>
           <button class="btn btn-outline btn-sm" onclick="copyPilotRequest('${ref}')">Text kopieren</button>
         </div>
-        <div style="font-size:.76rem;color:var(--text-light);margin-top:.55rem">${pilotEmail ? `Pilot-Inbox: ${pilotEmail} · Rueckmeldung innerhalb von ${responseTimeHours}h via ${opsContactChannel}` : 'Noch keine Pilot-Inbox konfiguriert. Hinterlegen Sie in den Einstellungen mindestens E-Mail, Rueckmeldefenster und Kontaktweg.'}</div>`;
+        <div style="font-size:.76rem;color:var(--text-light);margin-top:.55rem">${pilotEmail ? `Pilot-Inbox: ${pilotEmail} · Rückmeldung innerhalb von ${responseTimeHours}h via ${opsContactChannel}` : 'Noch keine Pilot-Inbox konfiguriert. Hinterlegen Sie in den Einstellungen mindestens E-Mail, Rückmeldefenster und Kontaktweg.'}</div>`;
     }
 
     const doneKey = runtime.getModuleMeta(currentBookingItem.type).doneKey;
@@ -992,7 +992,7 @@
     const email = document.getElementById('contact-email')?.value.trim() || '';
     const consent = !!document.getElementById('request-consent')?.checked;
     if(!name || !email || !consent){
-      alert('Bitte Kontaktangaben und Einwilligung fuer die Buchung ergaenzen.');
+      alert('Bitte Kontaktangaben und Einwilligung für die Buchung ergaenzen.');
       return false;
     }
 
@@ -1089,7 +1089,7 @@
     }
     if(confirmBannerTitle) confirmBannerTitle.textContent = 'Mietwagen erfolgreich reserviert!';
     if(confirmBannerText) confirmBannerText.textContent = `Ihre Reservierung für den ${offer.name} wurde beim Anbieter ${offer.provider} bestätigt.`;
-    if(confirmNext) confirmNext.textContent = 'Sie finden alle Details nun in Ihrer Reiseuebersicht.';
+    if(confirmNext) confirmNext.textContent = 'Sie finden alle Details nun in Ihrer Reiseübersicht.';
     if(confirmDetails) confirmDetails.innerHTML = `
       <div class="price-summary" style="margin-top:.8rem;background:var(--bg)">
         <div class="price-row"><span>Anbieter</span><strong>${offer.provider}</strong></div>
@@ -1142,7 +1142,7 @@
     const email = document.getElementById('contact-email')?.value.trim() || '';
     const consent = !!document.getElementById('request-consent')?.checked;
     if(!name || !email || !consent){
-      alert('Bitte Kontaktangaben und Einwilligung fuer die Buchung ergaenzen.');
+      alert('Bitte Kontaktangaben und Einwilligung für die Buchung ergaenzen.');
       return false;
     }
 
@@ -1377,7 +1377,7 @@
     const email = document.getElementById('contact-email')?.value.trim() || '';
     const consent = !!document.getElementById('request-consent')?.checked;
     if(!name || !email || !consent){
-      alert('Bitte Kontaktangaben und Einwilligung fuer die Buchung ergaenzen.');
+      alert('Bitte Kontaktangaben und Einwilligung für die Buchung ergaenzen.');
       return false;
     }
 
@@ -1488,7 +1488,7 @@
     }
     if(confirmBannerTitle) confirmBannerTitle.textContent = 'Flug erfolgreich gebucht!';
     if(confirmBannerText) confirmBannerText.textContent = `Ihr Ticket wurde ausgestellt (PNR: ${resResult.pnr}). Die Airline-Bestätigung liegt vor.`;
-    if(confirmNext) confirmNext.textContent = 'Ihre Buchung ist nun in Ihrer Reiseuebersicht sichtbar. Sie erhalten in Kürze eine Bestätigungs-E-Mail von der Airline.';
+    if(confirmNext) confirmNext.textContent = 'Ihre Buchung ist nun in Ihrer Reiseübersicht sichtbar. Sie erhalten in Kürze eine Bestätigungs-E-Mail von der Airline.';
     if(confirmDetails) confirmDetails.innerHTML = `
       <div class="price-summary" style="margin-top:.8rem;background:var(--bg)">
         <div class="price-row"><span>Fluggesellschaft</span><strong>${offer.airline?.name || 'Airline'}</strong></div>
