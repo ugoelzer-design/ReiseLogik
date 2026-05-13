@@ -304,10 +304,27 @@
   function startBookingFromFinder(name, event){
     event?.stopPropagation?.();
     runtime.setTrip({to:name, destination:name});
+    const today = new Date();
+    const fmt = d => d.toISOString().split('T')[0];
+    const add = (d, n) => {
+      const next = new Date(d);
+      next.setDate(next.getDate() + n);
+      return next;
+    };
+    const trip = runtime.getTrip() || {};
+    const dep = trip.depDate || fmt(add(today, 7));
+    const ret = trip.retDate || fmt(add(new Date(dep), 3));
+    const fromEl = global.document.getElementById('f-from');
     const toEl = global.document.getElementById('f-to');
+    const depEl = global.document.getElementById('f-dep');
+    const retEl = global.document.getElementById('f-ret');
+    if(fromEl && !fromEl.value) fromEl.value = trip.from || 'Frankfurt (FRA)';
     if(toEl) toEl.value = name;
+    if(depEl) depEl.value = dep;
+    if(retEl && !retEl.disabled) retEl.value = ret;
+    runtime.setTrip({from:fromEl?.value || trip.from || 'Frankfurt (FRA)', depDate:dep, retDate:ret});
     runtime.showPage('page-flights');
-    runtime.searchFlights();
+    global.setTimeout(()=>runtime.searchFlights(), 80);
   }
 
   function showHotelsFromFinder(name, event){
