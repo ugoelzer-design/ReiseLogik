@@ -62,7 +62,42 @@
   }
 
   function getHotelExternalBookingLabel(url){
-    return /booking\.com/i.test(url || '') ? 'Bei Booking.com buchen' : 'Extern buchen';
+    return /booking\.com/i.test(url || '') ? 'Booking.com pruefen' : 'Extern pruefen';
+  }
+
+  function buildGoogleSearchUrl(query){
+    return `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+  }
+
+  function buildGoogleFlightsUrl(flight){
+    const query = [
+      'Google Flights',
+      flight?.from ? `von ${flight.from}` : '',
+      flight?.to ? `nach ${flight.to}` : '',
+      flight?.dep ? `am ${flight.dep}` : '',
+      flight?.airline?.name || ''
+    ].filter(Boolean).join(' ');
+    return buildGoogleSearchUrl(query);
+  }
+
+  function buildGoogleHotelsUrl(hotel, context = {}){
+    const query = [
+      'Google Hotels',
+      hotel?.name || hotel?.dest || hotel?.address || '',
+      context.checkin && context.checkout ? `${context.checkin} bis ${context.checkout}` : '',
+      context.guests ? `${context.guests} Gaeste` : ''
+    ].filter(Boolean).join(' ');
+    return buildGoogleSearchUrl(query);
+  }
+
+  function buildGoogleCarsUrl(car){
+    const query = [
+      'Mietwagen',
+      car?.pickup || '',
+      car?.class || '',
+      car?.provider || ''
+    ].filter(Boolean).join(' ');
+    return buildGoogleSearchUrl(query);
   }
 
   function serializeInlineItem(item){
@@ -285,7 +320,9 @@
     const list = getDisplayList(data, runtime.getFlights, (a, b)=>b.valueScore - a.valueScore || a.price - b.price);
     document.getElementById('f-count').textContent = `${list.length} Flüge gefunden`;
     runtime.renderComparisonSection('flight', list);
-    document.getElementById('f-list').innerHTML = list.map(f=>`
+    document.getElementById('f-list').innerHTML = list.map(f=>{
+      const googleFlightsUrl = buildGoogleFlightsUrl(f);
+      return `
       <div class="flight-card" onclick="openBooking('flight',${serializeInlineItem(f)})">
         <div class="flight-route">
           <div>
@@ -312,10 +349,12 @@
           <div class="amount">€${f.price}</div>
           <div class="per">pro Person</div>
           <div style="font-size:.76rem;color:var(--success);margin-top:.2rem">${f.savings ? `bis zu €${f.savings} günstiger via ${runtime.getBestProviderLabel(f)}` : 'Direktpreis ist Bestpreis'}</div>
-          <button class="btn btn-primary btn-sm" style="margin-top:.5rem">Flug buchen</button>
+          <button class="btn btn-primary btn-sm" style="margin-top:.5rem" onclick="event.stopPropagation();window.open('${googleFlightsUrl}','_blank','noopener')">Bei Google pruefen</button>
+          <button class="btn btn-outline btn-sm" style="margin-top:.35rem" onclick="event.stopPropagation();openBooking('flight',${serializeInlineItem(f)})">Anfrage merken</button>
         </div>
       </div>
-    `).join('');
+    `;
+    }).join('');
   }
 
   function renderHotels(data){
@@ -372,6 +411,7 @@
         ? `Buchung findet beim Anbieter statt. TravelLogik speichert nur Reisedaten, Kostenschaetzung und den externen Tracking-Status.`
         : `${extraLabel.replace(/^[^A-Za-z]+/, '').trim()} ist hier nur als vorbereitete Weiterleitung gedacht. Diese Unterform ist noch keine echte Buchungsroute in TravelLogik.`;
       const externalBookingUrl = getHotelExternalBookingUrl(offer);
+      const googleHotelsUrl = buildGoogleHotelsUrl(offer, {checkin, checkout, guests});
       const primaryActionLabel = getHotelExternalBookingLabel(externalBookingUrl);
       const stayMeta = [
         h.nights ? `${h.nights} Naechte` : '',
@@ -381,12 +421,13 @@
       ].filter(Boolean).join(' · ');
       const actionButtons = isPrimaryBookableRoute
         ? `
-              <button class="btn btn-success btn-sm" onclick="startHotelHandoff(${serializeInlineItem(offer)},${JSON.stringify(externalBookingUrl)})">${primaryActionLabel}</button>
-              <button class="btn btn-outline btn-sm" onclick="openBooking('hotel',${serializeInlineItem(offer)})">Fuer Tracking erfassen</button>
-              <button class="btn btn-outline btn-sm" onclick="toggleHotelDetails('${escapeHtml(String(h.offerId || h.id))}')">${expandedHotelId === String(h.offerId || h.id) ? 'Details ausblenden' : 'Mehr Details'}</button>`
+              <button class="btn btn-success btn-sm" onclick="event.stopPropagation();window.open('${googleHotelsUrl}','_blank','noopener')">Google Hotels</button>
+              <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();startHotelHandoff(${serializeInlineItem(offer)},${JSON.stringify(externalBookingUrl)})">${primaryActionLabel}</button>
+              <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();openBooking('hotel',${serializeInlineItem(offer)})">Fuer Tracking erfassen</button>
+              <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();toggleHotelDetails('${escapeHtml(String(h.offerId || h.id))}')">${expandedHotelId === String(h.offerId || h.id) ? 'Details ausblenden' : 'Mehr Details'}</button>`
         : `
-              <button class="btn btn-sm" style="background:${extraColor};color:#fff" onclick="window.open('${extraUrl}','_blank')">↗ Extern weiter</button>
-              <button class="btn btn-outline btn-sm" onclick="openBooking('hotel',${serializeInlineItem(offer)})">Rueckfrage senden</button>`;
+              <button class="btn btn-sm" style="background:${extraColor};color:#fff" onclick="event.stopPropagation();window.open('${extraUrl}','_blank','noopener')">Extern pruefen</button>
+              <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();openBooking('hotel',${serializeInlineItem(offer)})">Rueckfrage senden</button>`;
       const roomOptionsHtml = selectedOption
         ? `<div class="hotel-rate-list">
             ${getHotelRoomOptions(h).map(option=>{
@@ -435,7 +476,7 @@
             <div style="font-size:.76rem;color:var(--success);text-align:right;margin-top:.35rem">${h.savings ? `bis zu €${h.savings} sparen via ${runtime.getBestProviderLabel(h)}` : 'Bester Direktpreis'}</div>
             ${isPrimaryBookableRoute ? `<div style="font-size:.72rem;color:var(--text-light);text-align:right;margin-top:.35rem">${escapeHtml('TravelLogik bucht dieses Hotel nicht selbst. Der Abschluss passiert extern beim Anbieter.')}</div>` : ''}
             <div style="display:flex;gap:.4rem;margin-top:.6rem;justify-content:flex-end;flex-wrap:wrap">
-              <button class="btn btn-outline btn-sm" onclick="window.open('${mapsUrl}','_blank')">🗺 Maps</button>
+              <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();window.open('${mapsUrl}','_blank','noopener')">Maps</button>
               ${actionButtons}
             </div>
           </div>
@@ -449,7 +490,9 @@
     const list = getDisplayList(data, runtime.getCars, (a, b)=>b.valueScore - a.valueScore || a.price - b.price);
     document.getElementById('c-count').textContent = `${list.length} Fahrzeuge gefunden`;
     runtime.renderComparisonSection('car', list);
-    document.getElementById('c-list').innerHTML = list.map(c=>`
+    document.getElementById('c-list').innerHTML = list.map(c=>{
+      const googleCarsUrl = buildGoogleCarsUrl(c);
+      return `
       <div class="car-card" onclick="openBooking('car',${serializeInlineItem(c)})">
         <div class="car-icon">${escapeHtml(c.emoji)}</div>
         <div>
@@ -468,10 +511,12 @@
           <div style="font-size:1.3rem;font-weight:700;color:var(--primary)">€${c.price}<span style="font-size:.75rem;color:var(--muted)">/Tag</span></div>
           <div style="font-size:.8rem;color:var(--muted)">€${c.total} (${c.days} T.)</div>
           <div style="font-size:.76rem;color:var(--success);margin-top:.2rem">${c.savings ? `bis zu €${c.savings} sparen` : 'Direktpreis ist Bestpreis'}</div>
-          <button class="btn btn-primary btn-sm" style="margin-top:.5rem">Mietwagen buchen</button>
+          <button class="btn btn-primary btn-sm" style="margin-top:.5rem" onclick="event.stopPropagation();window.open('${googleCarsUrl}','_blank','noopener')">Bei Google pruefen</button>
+          <button class="btn btn-outline btn-sm" style="margin-top:.35rem" onclick="event.stopPropagation();openBooking('car',${serializeInlineItem(c)})">Anfrage merken</button>
         </div>
       </div>
-    `).join('');
+    `;
+    }).join('');
   }
 
   global.TravelLogikResults = {

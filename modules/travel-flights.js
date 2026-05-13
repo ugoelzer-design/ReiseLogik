@@ -22,7 +22,16 @@
     {code:'HAJ', terms:['hannover', 'hanover', 'haj']},
     {code:'LEJ', terms:['leipzig', 'leipzig halle', 'lej']},
     {code:'SCN', terms:['saarbruecken', 'saarbrücken', 'saarbrucken', 'scn']},
-    {code:'FKB', terms:['karlsruhe', 'baden-baden', 'baden baden', 'karlsruhe baden-baden', 'karlsruhe/baden-baden', 'fkb']}
+    {code:'FKB', terms:['karlsruhe', 'baden-baden', 'baden baden', 'karlsruhe baden-baden', 'karlsruhe/baden-baden', 'fkb']},
+    {code:'BCN', terms:['barcelona', 'bcn']},
+    {code:'PMI', terms:['palma', 'mallorca', 'palma de mallorca', 'pmi']},
+    {code:'LIS', terms:['lissabon', 'lisbon', 'lis']},
+    {code:'LHR', terms:['london', 'heathrow', 'lhr']},
+    {code:'CDG', terms:['paris', 'charles de gaulle', 'cdg']},
+    {code:'FCO', terms:['rom', 'rome', 'fiumicino', 'fco']},
+    {code:'JFK', terms:['new york', 'jfk']},
+    {code:'HND', terms:['tokio', 'tokyo', 'haneda', 'hnd']},
+    {code:'DXB', terms:['dubai', 'dxb']}
   ];
 
   const AIRPORT_OPTIONS = [
@@ -212,14 +221,33 @@
     global.open(url, '_blank');
   }
 
+  function openGoogleFlights(){
+    const from = document.getElementById('f-from').value;
+    const to = document.getElementById('f-to').value;
+    const dep = document.getElementById('f-dep').value;
+    const ret = document.getElementById('f-ret')?.disabled ? '' : (document.getElementById('f-ret')?.value || '');
+    const pax = document.getElementById('f-pax')?.value || '1';
+    const query = [
+      'Google Flights',
+      from ? `von ${from}` : '',
+      to ? `nach ${to}` : '',
+      dep ? `am ${dep}` : '',
+      ret ? `zurueck ${ret}` : '',
+      `${pax} Personen`
+    ].filter(Boolean).join(' ');
+    global.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, '_blank', 'noopener');
+  }
+
   global.TravelLogikFlights = {
     configureTravelFlights,
     searchFlights,
     initAirportSuggestions,
-    openSuperFlights
+    openSuperFlights,
+    openGoogleFlights
   };
 
   global.searchFlights = searchFlights;
   global.openSuperFlights = openSuperFlights;
+  global.openGoogleFlights = openGoogleFlights;
   global.document.addEventListener('DOMContentLoaded', initAirportSuggestions);
 })(window);
