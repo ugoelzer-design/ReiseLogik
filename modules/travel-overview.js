@@ -213,7 +213,6 @@ function renderOverview(){
   }
 
   if(roadmapEl){
-...
       roadmapEl.innerHTML = MVP_ROADMAP.map(item=>`
         <div class="roadmap-item">
           <span class="status-chip status-${item.status}">${item.phase}</span>
